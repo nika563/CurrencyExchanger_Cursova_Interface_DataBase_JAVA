@@ -1,4 +1,4 @@
-package JInterface;
+package src.JInterface;
 
 public class startInterface {
     public static formInreface form;

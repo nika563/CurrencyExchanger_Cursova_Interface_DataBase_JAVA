@@ -1,4 +1,4 @@
-package JInterface;
+package src.JInterface;
 
 import javax.swing.*;
 import java.awt.*;
