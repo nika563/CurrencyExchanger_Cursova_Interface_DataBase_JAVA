@@ -1,9 +1,9 @@
 package src;
 
-import src.JInterface.startInterface;
+import src.JInterface.openInterface;
 public class Main {
     public static void main(String[] args) {
-        startInterface startInterface = new startInterface();
+        openInterface startInterface = new openInterface();
         startInterface.interfaceReg();
     }
 }
