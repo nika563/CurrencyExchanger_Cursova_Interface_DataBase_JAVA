@@ -113,7 +113,7 @@ public class singUpInterface extends JFrame {
                         Connection con = DriverManager.getConnection(url, username, password);
                         textError.setText("Connection successful!");
                         openInterface.closeForm();
-                        baseInterface secondFrame = new baseInterface();
+                        cashierInterface secondFrame = new cashierInterface();
                         secondFrame.setVisible(true);
                     }
                     if (user.equals(username) && !pass.equals(password)) {
@@ -129,7 +129,7 @@ public class singUpInterface extends JFrame {
                         textError.setText("Connection successful!");
                         fileWriteCache.write(username + "," + password);
                         openInterface.closeForm();
-                        baseInterface secondFrame = new baseInterface();
+                        cashierInterface secondFrame = new cashierInterface();
                         secondFrame.setVisible(true);
                     }
                 }
@@ -139,7 +139,7 @@ public class singUpInterface extends JFrame {
                 fileWriteCache.write(username + "," + password);
                 textError.setText("Connection successful!");
                 openInterface.closeForm();
-                baseInterface secondFrame = new baseInterface();
+                cashierInterface secondFrame = new cashierInterface();
                 secondFrame.setVisible(true);
             }
         }
