@@ -11,7 +11,8 @@ import java.io.FileWriter;
 import java.io.File;
 import java.io.IOException; //error file
 //sql
-//import java.sql.Connection;
+import java.sql.*;
+import java.sql.Connection;
 import java.sql.DriverManager;
 
 public class singUpInterface extends JFrame {
@@ -101,45 +102,68 @@ public class singUpInterface extends JFrame {
         File serviceFile = new File(linkService);
         BufferedReader headerFileReadCache = new BufferedReader(new FileReader(serviceFile));
         BufferedWriter headerFileWriteCache = new BufferedWriter(new FileWriter(serviceFile, true));
+        String searchRole = "SELECT role_employee FROM employee WHERE login_employee = \'" + username + "\';";
 
         try {
             String line;
             if (headerFileReadCache.readLine() != null && serviceFile.exists()) {
                 headerFileReadCache.close();
                 BufferedReader fileReadCache = new BufferedReader(new FileReader(serviceFile));
-
+                boolean addNewLoginPassword = false;
                 while ((line = fileReadCache.readLine()) != null) {
                     String[] credentials = line.split(",");
                     String user = credentials[0];
                     String pass = credentials[1];
                     if (user.equals(username) && pass.equals(password)) {
-                        DriverManager.getConnection(url, username, password);
+                        Connection conn = DriverManager.getConnection(url, username, password);
                         textError.setText("Connection successful!");
                         System.out.println("Connection successful! 11111"); //delete
                         openInterface.closeForm();
-                        cashierInterface secondFrame = new cashierInterface();
-                        secondFrame.setVisible(true);
+                        addNewLoginPassword = true;
+
+                        Statement statement = conn.createStatement();
+                        ResultSet resultSet = statement.executeQuery(searchRole);
+                        if (resultSet.next()) {
+                            String role = resultSet.getString("role_employee");
+                            System.out.println("role: " + role);
+                            if(role.equals("cashier")) {
+                                cashierInterface cashierFrame = new cashierInterface();
+                                cashierFrame.setVisible(true);
+                            }
+                            else if(role.equals("admin")) {
+                                adminInterface adminFrame = new adminInterface();
+                                adminFrame.setVisible(true);
+                            }
+                        }
                         break;
                     }
-                    else if (!user.equals(username) && !pass.equals(password)) {
-                        DriverManager.getConnection(url, username, password);
-                        textError.setText("Connection successful!");
-                        System.out.println("Connection successful! 22222"); //delete
-                        headerFileWriteCache.write(username + "," + password + "\n");
-                        openInterface.closeForm();
-                        cashierInterface secondFrame = new cashierInterface();
-                        secondFrame.setVisible(true);
-                        break;
-                    }
-                    else if (!user.equals(username)) {
+                    else if (!user.equals(username) && pass.equals(password)) {
                         textError.setText("Not correct login");
                         System.out.println("Not correct login"); //delete
                         break;
                     }
-                    else if (!pass.equals(password)) {
+                    else if (user.equals(username) && !pass.equals(password)) {
                         textError.setText("Not correct password");
                         System.out.println("Not correct password"); //delete
                         break;
+                    }
+                }
+                if (!addNewLoginPassword) {
+                    DriverManager.getConnection(url, username, password);
+                    textError.setText("Connection successful!");
+                    System.out.println("Connection successful! 22222"); //delete
+                    headerFileWriteCache.write(username + "," + password + "\n");
+                    openInterface.closeForm();
+                    cashierInterface secondFrame = new cashierInterface();
+                    secondFrame.setVisible(true);
+
+                    if(searchRole.equals("cashier")) {
+                        cashierInterface cashierFrame = new cashierInterface();
+                        cashierFrame.setVisible(true);
+                    }
+                    else if(searchRole.equals("admin")) {
+                        adminInterface adminFrame = new adminInterface();
+                        adminFrame.setVisible(true);
                     }
                 }
             }
