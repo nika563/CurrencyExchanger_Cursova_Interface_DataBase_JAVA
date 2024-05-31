@@ -11,7 +11,7 @@ import java.io.FileWriter;
 import java.io.File;
 import java.io.IOException; //error file
 //sql
-import java.sql.Connection;
+//import java.sql.Connection;
 import java.sql.DriverManager;
 
 public class singUpInterface extends JFrame {
@@ -99,45 +99,59 @@ public class singUpInterface extends JFrame {
         //work with file
         String linkService = "src/cache/cache_29052024.txt";
         File serviceFile = new File(linkService);
-        BufferedReader fileReadCache = new BufferedReader(new FileReader(serviceFile));
-        BufferedWriter fileWriteCache = new BufferedWriter(new FileWriter(serviceFile, true));
+        BufferedReader headerFileReadCache = new BufferedReader(new FileReader(serviceFile));
+        BufferedWriter headerFileWriteCache = new BufferedWriter(new FileWriter(serviceFile, true));
 
         try {
-            if (fileReadCache.readLine() != null) {
-                String line;
+            String line;
+            if (headerFileReadCache.readLine() != null && serviceFile.exists()) {
+                headerFileReadCache.close();
+                BufferedReader fileReadCache = new BufferedReader(new FileReader(serviceFile));
+
                 while ((line = fileReadCache.readLine()) != null) {
-                    String[] credentials = line.split(", ");
+                    String[] credentials = line.split(",");
                     String user = credentials[0];
                     String pass = credentials[1];
                     if (user.equals(username) && pass.equals(password)) {
-                        Connection con = DriverManager.getConnection(url, username, password);
+                        DriverManager.getConnection(url, username, password);
                         textError.setText("Connection successful!");
+                        System.out.println("Connection successful! 11111"); //delete
                         openInterface.closeForm();
                         cashierInterface secondFrame = new cashierInterface();
                         secondFrame.setVisible(true);
-                    }
-                    if (user.equals(username) && !pass.equals(password)) {
-                        textError.setText("Not correct password");
                         break;
                     }
-                    if (!user.equals(username) && pass.equals(password)) {
+                    else if (!user.equals(username) && !pass.equals(password)) {
+                        DriverManager.getConnection(url, username, password);
+                        textError.setText("Connection successful!");
+                        System.out.println("Connection successful! 22222"); //delete
+                        headerFileWriteCache.write(username + "," + password + "\n");
+                        openInterface.closeForm();
+                        cashierInterface secondFrame = new cashierInterface();
+                        secondFrame.setVisible(true);
+                        break;
+                    }
+                    else if (!user.equals(username)) {
                         textError.setText("Not correct login");
+                        System.out.println("Not correct login"); //delete
                         break;
                     }
-                    if (!user.equals(username) && !pass.equals(password)) {
-                        Connection con = DriverManager.getConnection(url, username, password);
-                        textError.setText("Connection successful!");
-                        fileWriteCache.write(username + "," + password);
-                        openInterface.closeForm();
-                        cashierInterface secondFrame = new cashierInterface();
-                        secondFrame.setVisible(true);
+                    else if (!pass.equals(password)) {
+                        textError.setText("Not correct password");
+                        System.out.println("Not correct password"); //delete
+                        break;
                     }
                 }
             }
-            else if (fileReadCache.readLine() == null) {
-                Connection con = DriverManager.getConnection(url, username, password);
-                fileWriteCache.write(username + "," + password);
+            else if (headerFileReadCache.readLine() == null) {
+                if(!serviceFile.exists()){
+                    serviceFile.createNewFile();
+                    System.out.println("Create file serviceFile"); //delete
+                }
+                DriverManager.getConnection(url, username, password);
+                headerFileWriteCache.write(username + "," + password + "\n");
                 textError.setText("Connection successful!");
+                System.out.println("Connection successful! 33333"); //delete
                 openInterface.closeForm();
                 cashierInterface secondFrame = new cashierInterface();
                 secondFrame.setVisible(true);
@@ -146,7 +160,7 @@ public class singUpInterface extends JFrame {
         catch (Exception ex){
             System.out.println("Error: " + ex);
         }
-        fileReadCache.close();
-        fileWriteCache.close();
+        headerFileReadCache.close();
+        headerFileWriteCache.close();
     }
 }

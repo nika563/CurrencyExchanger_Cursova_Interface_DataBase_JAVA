@@ -7,9 +7,19 @@ import java.awt.*;
 
 public class adminInterface extends JFrame{
     public adminInterface() {
-        super("Exchanger currency");
+        super("ADMIN");
         super.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); //stop program when exit
-        super.setBounds(500, 200, 600, 500); //size icon
+
+        GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+        if (gd.isFullScreenSupported()) {
+            setUndecorated(true);
+            gd.setFullScreenWindow(this);
+        } else {
+            System.err.println("Полноэкранный режим не поддерживается");
+            setSize(100, 100); //Пример размера, если полноэкранный режим не поддерживается
+            setVisible(true);
+        }
+
         Container con = super.getContentPane(); //create blocks(button, input ...)
         con.setBackground(Color.decode("#5FB67D"));
 

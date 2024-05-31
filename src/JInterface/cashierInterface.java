@@ -7,7 +7,7 @@ import java.awt.*;
 
 public class cashierInterface extends JFrame {
     public cashierInterface() {
-        super("Exchanger currency");
+        super("CASHIER");
         super.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); //stop program when exit
         super.setBounds(500, 200, 600, 500); //size icon
         Container con = super.getContentPane(); //create blocks(button, input ...)
