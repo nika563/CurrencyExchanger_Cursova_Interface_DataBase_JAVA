@@ -32,7 +32,7 @@ public class singUpInterface extends JFrame {
         JLabel header = new JLabel("Sign up".toUpperCase());
         header.setFont(new Font("Arial",  Font.BOLD, 20));
         header.setForeground(Color.black);
-        header.setBounds(250, 20,100,40);
+        header.setBounds(250, 20,100, Toolkit.getDefaultToolkit().getScreenSize().height);
 
         //login
         JLabel loginText = new JLabel("Login:");
