@@ -20,7 +20,7 @@ public class singUpInterface extends JFrame {
     JLabel textError;
     Connection conn;
     Statement statement;
-    boolean resultSet = false;
+    ResultSet resultSet;
     public singUpInterface(){
         super("Exchanger currency");
         super.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); //stop program when exit
@@ -104,7 +104,7 @@ public class singUpInterface extends JFrame {
         File serviceFile = new File(linkService);
         BufferedReader headerFileReadCache = new BufferedReader(new FileReader(serviceFile));
         BufferedWriter headerFileWriteCache = new BufferedWriter(new FileWriter(serviceFile, true));
-        String checkPermissions = "SELECT table_schema, table_name, privilege_type FROM information_schema.table_privileges WHERE grantee = \'" + username + "\' AND table_name = \'employee\';";
+        String checkPermissions = "SELECT role_employee FROM employee WHERE login_employee = \'" + username + "\';";
 
         try {
             String line;
@@ -124,16 +124,18 @@ public class singUpInterface extends JFrame {
                         addNewLoginPassword = true;
 
                         statement = conn.createStatement();
-                        resultSet = statement.execute(checkPermissions);
-                        if(resultSet) {
-                            cashierInterface cashierFrame = new cashierInterface();
-                            cashierFrame.setVisible(true);
-                            break;
-                        }
-                        else if(!resultSet) {
-                            adminInterface adminFrame = new adminInterface();
-                            adminFrame.setVisible(true);
-                            break;
+                        resultSet = statement.executeQuery(checkPermissions);
+                        if (resultSet.next()) {
+                            String role = resultSet.getString("role_employee");
+                            if ("admin".equals(role)) {
+                                adminInterface adminFrame = new adminInterface();
+                                adminFrame.setVisible(true);
+                                break;
+                            } else if ("cashier".equals(role)) {
+                                cashierInterface cashierFrame = new cashierInterface();
+                                cashierFrame.setVisible(true);
+                                break;
+                            }
                         }
                     }
                     else if (!user.equals(username) && pass.equals(password)) {
@@ -155,16 +157,19 @@ public class singUpInterface extends JFrame {
                     openInterface.closeForm();
 
                     statement = conn.createStatement();
-                    resultSet = statement.execute(checkPermissions);
-                    if(resultSet) {
-                        cashierInterface cashierFrame = new cashierInterface();
-                        cashierFrame.setVisible(true);
-                    }
-                    else if(!resultSet){
-                        adminInterface adminFrame = new adminInterface();
-                        adminFrame.setVisible(true);
+                    resultSet = statement.executeQuery(checkPermissions);
+                    if (resultSet.next()) {
+                        String role = resultSet.getString("role_employee");
+                        if ("admin".equals(role)) {
+                            adminInterface adminFrame = new adminInterface();
+                            adminFrame.setVisible(true);
+                        } else if ("cashier".equals(role)) {
+                            cashierInterface cashierFrame = new cashierInterface();
+                            cashierFrame.setVisible(true);
+                        }
                     }
                 }
+                fileReadCache.close();
             }
             else if (headerFileReadCache.readLine() == null) {
                 if(!serviceFile.exists()){
@@ -178,16 +183,17 @@ public class singUpInterface extends JFrame {
                 openInterface.closeForm();
 
                 statement = conn.createStatement();
-                resultSet = statement.execute(checkPermissions);
-                if(resultSet) {
-                    cashierInterface cashierFrame = new cashierInterface();
-                    cashierFrame.setVisible(true);
+                resultSet = statement.executeQuery(checkPermissions);
+                if (resultSet.next()) {
+                    String role = resultSet.getString("role_employee");
+                    if ("admin".equals(role)) {
+                        adminInterface adminFrame = new adminInterface();
+                        adminFrame.setVisible(true);
+                    } else if ("cashier".equals(role)) {
+                        cashierInterface cashierFrame = new cashierInterface();
+                        cashierFrame.setVisible(true);
+                    }
                 }
-                else if(!resultSet){
-                    adminInterface adminFrame = new adminInterface();
-                    adminFrame.setVisible(true);
-                }
-
             }
         }
         catch (Exception ex){
