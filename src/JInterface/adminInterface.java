@@ -13,15 +13,17 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.CompoundBorder;
 //sql
 import java.sql.*;
-import java.sql.DriverManager;
 
 public class adminInterface extends JFrame implements ActionListener{
     private CardLayout cardLayout;
     private JPanel cardPanel;
     JComboBox<String> comboBox, selectRoleComboBox;
     JTextField name_employee, telephone_employee, gmail_employee, login_employee, password_employee;
+    JLabel textError;
+    JButton send;
     singUpInterface singUpInterface = new singUpInterface();
-    Statement statement = singUpInterface.getStatement();
+    Connection conn = singUpInterface.getConnection();
+    String addRole, addRoleRightsCashier, addRoleAdmin, addRoleRightsAdmin;
 
     public adminInterface(){
         super("ADMIN");
@@ -279,13 +281,18 @@ public class adminInterface extends JFrame implements ActionListener{
         });
         selectRoleComboBox.setSelectedIndex(0);
         //button
-        JButton send = new JButton("Send");
+        send = new JButton("Send");
         send.setFont(new Font("Arial", Font.PLAIN, 18));
         send.setForeground(Color.decode("#CADACF")); //color text
         send.setBackground(Color.decode("#284F00"));  //color background
         send.setBorder(BorderFactory.createLineBorder(Color.decode("#284F00"), 2));
         send.setFocusPainted(false);
         send.setBounds(180, 130,230,35);
+        //textError
+        textError = new JLabel("");
+        textError.setFont(new Font("Arial", Font.PLAIN, 18));
+        textError.setForeground(Color.decode("#000000"));
+        textError.setBounds(180, 210,230,20);
         //end_temporarily_add_data_for_employee!!!!!!!!!!!!!
 
 
@@ -375,15 +382,25 @@ public class adminInterface extends JFrame implements ActionListener{
         public void actionPerformed(ActionEvent e) {
             try{
                 String selectedItem = (String) comboBox.getSelectedItem();
-                if (selectedItem.equals("Працівник")) {
-                    String name = name_employee.getText();
-                    String telephone = telephone_employee.getText();
-                    String gmail = gmail_employee.getText();
-                    String login = login_employee.getText();
-                    String password = password_employee.getText();
+                if ("Працівник".equals(selectedItem)) {
+                    String name = name_employee.getText().trim();
+                    String telephone = telephone_employee.getText().trim();
+                    String gmail = gmail_employee.getText().trim();
+                    String login = login_employee.getText().trim();
+                    String password = password_employee.getText().trim();
                     String role = (String) selectRoleComboBox.getSelectedItem();
                     addDataInDataBase(selectedItem, name, telephone, gmail, login, password, role);
                 }
+                else if("Валюти".equals(selectedItem)){}
+                else if("Послуга".equals(selectedItem)){}
+                else if("Курс обміну".equals(selectedItem)){}
+                else if("Тариф".equals(selectedItem)){}
+                else if("Рахунок".equals(selectedItem)){}
+                else if("Зміна".equals(selectedItem)){}
+                else if("Сума в касі".equals(selectedItem)){}
+                else if("Присутність".equals(selectedItem)){}
+                else if("Валюта та курс обміну".equals(selectedItem)){}
+                else if("Валюти та послуги".equals(selectedItem)){}
             }
             catch (Exception ex){
                 System.out.println("Error: " + ex);
@@ -395,13 +412,38 @@ public class adminInterface extends JFrame implements ActionListener{
         for (Component component : components) {
             if (component instanceof JButton) {
                 JButton button = (JButton) component;
-                if ("Название кнопки".equals(button.getText())) {
+                if (button.equals(send)) {
                     cardPanel.remove(button);
                 }
-            } else if (component instanceof JComboBox) {
+            }
+            else if (component instanceof JComboBox) {
                 JComboBox<?> box = (JComboBox<?>) component;
-                if ("ccccc".equals(box.getName())) {
+                if (box.equals(selectRoleComboBox)) {
                     cardPanel.remove(box);
+                }
+            }
+            else if (component instanceof JLabel) {
+                JLabel jLabel = (JLabel) component;
+                if (jLabel.equals(textError)) {
+                    cardPanel.remove(jLabel);
+                }
+            }
+            else if (component instanceof JTextField) {
+                JTextField textField = (JTextField) component;
+                if (textField.equals(name_employee)) {
+                    cardPanel.remove(textField);
+                }
+                else if (textField.equals(telephone_employee)) {
+                    cardPanel.remove(textField);
+                }
+                else if (textField.equals(gmail_employee)) {
+                    cardPanel.remove(textField);
+                }
+                else if (textField.equals(login_employee)) {
+                    cardPanel.remove(textField);
+                }
+                else if (textField.equals(password_employee)) {
+                    cardPanel.remove(textField);
                 }
             }
         }
@@ -409,26 +451,86 @@ public class adminInterface extends JFrame implements ActionListener{
     public void addDataInDataBase(String selectedItem, String name, String telephone, String gmail, String login, String password, String role){
         try {
             String sqlAddData;
-            if (selectedItem.equals("Працівник")) {
-                System.out.println("Працівник 111111");
-                System.out.println(statement);
+            if ("Працівник".equals(selectedItem))  {
+                System.out.println("Працівник 111111"); //delete
                 sqlAddData = "INSERT INTO employee(name_employee,telephone_employee,gmail_employee,login_employee," +
-                        "password_employee,role_employee)" + "VALUES (" + "\'" + name + "\'" + "\'" + telephone + "\'" + "\'" + gmail + "\'" +
-                        "\'" + login + "\'" + "\'" + password + "\'" + "\'" + role + "\'" + ");";
+                        "password_employee,role_employee)" + "VALUES (" + "\'" + name + "\'," + "\'" + telephone + "\'," + "\'" + gmail + "\'," +
+                        "\'" + login + "\'," + "\'" + password + "\'," + "\'" + role + "\'" + ");";
+
+                addRole = "CREATE ROLE " + login + " WITH LOGIN PASSWORD \'" + password + "\';\n";
+                addRoleRightsCashier = "GRANT SELECT (sell_score, purchased_score, id_currency_exchanger_rate, day_score, result_price_score, id_service, id_employee) ON score TO " + login + ";\n" +
+                        "GRANT INSERT (sell_score, purchased_score, id_currency_exchanger_rate, day_score, result_price_score, id_service, id_employee) ON score TO " + login + ";\n" +
+                        "GRANT UPDATE (sell_score, purchased_score, id_currency_exchanger_rate, day_score, result_price_score, id_service, id_employee) ON score TO " + login + ";\n" +
+                        "GRANT DELETE ON score TO " + login + ";\n" +
+                        "GRANT SELECT (name_employee, telephone_employee, login_employee, password_employee, role_employee) ON employee TO " + login + ";\n" +
+                        "GRANT INSERT (name_employee, telephone_employee, login_employee, password_employee, role_employee) ON employee TO " + login + ";\n" +
+                        "GRANT UPDATE (name_employee, telephone_employee, login_employee, password_employee, role_employee) ON employee TO " + login + ";\n" +
+                        "GRANT DELETE ON employee TO " + login + ";";
+                addRoleRightsAdmin = "GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO " + login + ";\n" +
+                        "ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO " + login + ";";
+
                 String checkDataName = "SELECT name_employee FROM employee WHERE name_employee=\'" + name + "\';";
                 String checkDataTelephone = "SELECT telephone_employee FROM employee WHERE telephone_employee=\'" + telephone + "\';";
                 String checkDataLogin = "SELECT login_employee FROM employee WHERE login_employee=\'" + login + "\';";
                 String checkDataPassword = "SELECT password_employee FROM employee WHERE password_employee=\'" + password + "\';";
-                boolean booleanName = statement.execute(checkDataName);
-                boolean booleanLogin = statement.execute(checkDataLogin);
-                boolean booleanPassword = statement.execute(checkDataPassword);
-                boolean booleanTelephone = statement.execute(checkDataTelephone);
-                if(booleanName != true && booleanLogin != true && booleanPassword != true && booleanTelephone != true) {
-                    statement.executeUpdate(sqlAddData);
-                    System.out.println("Працівник 111111{11111}");
+
+                Statement statement = conn.createStatement();
+                ResultSet resultName = statement.executeQuery(checkDataName);
+                Statement statement1 = conn.createStatement();
+                ResultSet resultLogin = statement1.executeQuery(checkDataLogin);
+                Statement statement2 = conn.createStatement();
+                ResultSet resultPassword = statement2.executeQuery(checkDataPassword);
+                Statement statement3 = conn.createStatement();
+                ResultSet resultTelephone = statement3.executeQuery(checkDataTelephone);
+
+                if (!resultName.next() && !resultLogin.next() && !resultPassword.next() && !resultTelephone.next()) {
+                    if("cashier".equals(role)) {
+                        statement.executeUpdate(sqlAddData);
+                        statement.executeUpdate(addRole);
+                        statement.executeUpdate(addRoleRightsCashier);
+                        System.out.println("Працівник 111111{11111}"); //delete
+                        textError.setText("Add data in Data Base");
+                    }
+                    else if("admin".equals(role)) {
+                        statement.executeUpdate(sqlAddData);
+                        statement.executeUpdate(addRole);
+                        statement.executeUpdate(addRoleRightsAdmin);
+                        System.out.println("Працівник 111111{22222}"); //delete
+                        textError.setText("Add data in Data Base");
+                    }
                 }
-                System.out.println("Працівник 22222");
+                else{
+                    if(!resultName.next()){
+                        textError.setText("This name where in Database");
+                    }
+                    if(!resultLogin.next()){
+                        textError.setText("This login where in Database");
+                    }
+                    if(!resultPassword.next()){
+                        textError.setText("This password where in Database");
+                    }
+                    if(!resultTelephone.next()){
+                        textError.setText("This name telephone in Database");
+                    }
+                    else{
+                        textError.setText("This data in Database");
+                    }
+                }
+                statement.close();
+                statement1.close();
+                statement2.close();
+                statement3.close();
             }
+            else if("Валюти".equals(selectedItem)){}
+            else if("Послуга".equals(selectedItem)){}
+            else if("Курс обміну".equals(selectedItem)){}
+            else if("Тариф".equals(selectedItem)){}
+            else if("Рахунок".equals(selectedItem)){}
+            else if("Зміна".equals(selectedItem)){}
+            else if("Сума в касі".equals(selectedItem)){}
+            else if("Присутність".equals(selectedItem)){}
+            else if("Валюта та курс обміну".equals(selectedItem)){}
+            else if("Валюти та послуги".equals(selectedItem)){}
         }
         catch (Exception ex){
             System.out.println("Errror: " + ex);

@@ -18,8 +18,8 @@ import java.sql.DriverManager;
 public class singUpInterface extends JFrame {
     JTextField loginInput, passwordInput;
     JLabel textError;
-    Connection conn;
-    Statement statement;
+    public static Connection conn;
+    public static Statement statement;
     ResultSet resultSet;
     public singUpInterface(){
         super("Exchanger currency");
@@ -137,6 +137,7 @@ public class singUpInterface extends JFrame {
                                 break;
                             }
                         }
+                        statement.close();
                     }
                     else if (!user.equals(username) && pass.equals(password)) {
                         textError.setText("Not correct login");
@@ -168,6 +169,7 @@ public class singUpInterface extends JFrame {
                             cashierFrame.setVisible(true);
                         }
                     }
+                    statement.close();
                 }
                 fileReadCache.close();
             }
@@ -194,6 +196,7 @@ public class singUpInterface extends JFrame {
                         cashierFrame.setVisible(true);
                     }
                 }
+                statement.close();
             }
         }
         catch (Exception ex){
@@ -204,7 +207,8 @@ public class singUpInterface extends JFrame {
         headerFileWriteCache.close();
     }
 
-    public Statement getStatement() {
-        return statement;
+    public Connection getConnection() {
+        System.out.println("conn{000}: " + conn);
+        return conn;
     }
 }
