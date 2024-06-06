@@ -16,11 +16,11 @@ import java.sql.*;
 
 public class adminInterface extends JFrame implements ActionListener{
     private CardLayout cardLayout;
-    private JPanel cardPanel;
-    JComboBox<String> comboBox, selectRoleComboBox;
-    JTextField name_employee, telephone_employee, gmail_employee, login_employee, password_employee;
-    JLabel textError;
-    JButton send;
+    private JPanel cardPanel, panel;
+    private static JComboBox<String> comboBox, selectRoleComboBox;
+    private static JTextField name_employee, telephone_employee, gmail_employee, login_employee, password_employee;
+    private static JLabel textError;
+    private static JButton send;
     singUpInterface singUpInterface = new singUpInterface();
     Connection conn = singUpInterface.getConnection();
     String addRole, addRoleRightsCashier, addRoleAdmin, addRoleRightsAdmin;
@@ -54,7 +54,7 @@ public class adminInterface extends JFrame implements ActionListener{
     @Override
     public void actionPerformed(ActionEvent e) {}
     private JPanel createPanelAddData(String cardName)  {
-        JPanel panel = new JPanel(null);
+        panel = new JPanel(null);
         JPanel menu = new JPanel(null);
         panel.setBackground(Color.decode("#5FB67D"));
         menu.setBackground(Color.decode("#228845"));
@@ -106,14 +106,12 @@ public class adminInterface extends JFrame implements ActionListener{
         deleteData.setForeground(Color.black);
         deleteData.setBounds(0, 180,150,40);
         //comboBox
-        String[] menuItems = {"", "Працівник", "Валюти", "Послуга", "Курс обміну", "Тариф",
-                "Рахунок", "Зміна", "Сума в касі", "Присутність", "Валюта та курс обміну", "Валюти та послуги"};
+        String[] menuItems = {"", "Працівник", "Валюти", "Послуга", "Курс обміну", "Тариф", "Рахунок", "Зміна", "Сума в касі", "Присутність", "Валюта та курс обміну", "Валюти та послуги"};
         comboBox = new JComboBox<>(menuItems);
         comboBox.setBounds(180, 80,230,35);
         comboBox.setFont(new Font("Arial", Font.PLAIN, 18));
         comboBox.setForeground(Color.black);
         comboBox.setBackground(Color.decode("#24743F"));
-
         comboBox.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
@@ -137,236 +135,238 @@ public class adminInterface extends JFrame implements ActionListener{
         });
         comboBox.setSelectedIndex(0);
 
-
-
-
-
-
-
-
-
-        //start_temporarily_add_data_for_employee!!!!!!!!!!!!!
-        //name_employee
-        name_employee = new JTextField("Enter name employee");
-        name_employee.setBounds(420, 80,190,35);
-        name_employee.setFont(new Font("Arial", Font.PLAIN, 18));
-        name_employee.setForeground(Color.black);
-        name_employee.setBackground(Color.decode("#24743F"));
-        name_employee.setBorder(BorderFactory.createEmptyBorder(5,5,5,0));
-        name_employee.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusGained(FocusEvent e) {
-                if (name_employee.getText().equals("Enter name employee")) {
-                    name_employee.setText("");
-                }
-            }
-            @Override
-            public void focusLost(FocusEvent e) {
-                if (name_employee.getText().isEmpty()) {
-                    name_employee.setText("Enter name employee");
-                }
-            }
-        });
-        //telephone_employee
-        telephone_employee = new JTextField("Telephone (+777-77-77)");
-        telephone_employee.setBounds(620, 80,220,35);
-        telephone_employee.setFont(new Font("Arial", Font.PLAIN, 18));
-        telephone_employee.setForeground(Color.black);
-        telephone_employee.setBackground(Color.decode("#24743F"));
-        telephone_employee.setBorder(BorderFactory.createEmptyBorder(5,10,5,0));
-        telephone_employee.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusGained(FocusEvent e) {
-                if (telephone_employee.getText().equals("Telephone (+777-77-77)")) {
-                    telephone_employee.setText("");
-                }
-            }
-            @Override
-            public void focusLost(FocusEvent e) {
-                if (telephone_employee.getText().isEmpty()) {
-                    telephone_employee.setText("Telephone (+777-77-77)");
-                }
-            }
-        });
-        //gmail_employee
-        gmail_employee = new JTextField("Gmail @gmail.com");
-        gmail_employee.setBounds(850, 80,170,35);
-        gmail_employee.setFont(new Font("Arial", Font.PLAIN, 18));
-        gmail_employee.setForeground(Color.black);
-        gmail_employee.setBackground(Color.decode("#24743F"));
-        gmail_employee.setBorder(BorderFactory.createEmptyBorder(5,10,5,0));
-        gmail_employee.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusGained(FocusEvent e) {
-                if (gmail_employee.getText().equals("Gmail @gmail.com")) {
-                    gmail_employee.setText("");
-                }
-            }
-            @Override
-            public void focusLost(FocusEvent e) {
-                if (gmail_employee.getText().isEmpty()) {
-                    gmail_employee.setText("Gmail @gmail.com");
-                }
-            }
-        });
-        //login_employee
-        login_employee = new JTextField("Enter login");
-        login_employee.setBounds(1030, 80,105,35);
-        login_employee.setFont(new Font("Arial", Font.PLAIN, 18));
-        login_employee.setForeground(Color.black);
-        login_employee.setBackground(Color.decode("#24743F"));
-        login_employee.setBorder(BorderFactory.createEmptyBorder(5,10,5,0));
-        login_employee.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusGained(FocusEvent e) {
-                if (login_employee.getText().equals("Enter login")) {
-                    login_employee.setText("");
-                }
-            }
-            @Override
-            public void focusLost(FocusEvent e) {
-                if (login_employee.getText().isEmpty()) {
-                    login_employee.setText("Enter login");
-                }
-            }
-        });
-        //password_employee
-        password_employee = new JTextField("Enter password");
-        password_employee.setBounds(1145, 80,150,35);
-        password_employee.setFont(new Font("Arial", Font.PLAIN, 18));
-        password_employee.setForeground(Color.black);
-        password_employee.setBackground(Color.decode("#24743F"));
-        password_employee.setBorder(BorderFactory.createEmptyBorder(5,10,5,0));
-        password_employee.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusGained(FocusEvent e) {
-                if (password_employee.getText().equals("Enter password")) {
-                    password_employee.setText("");
-                }
-            }
-            @Override
-            public void focusLost(FocusEvent e) {
-                if (password_employee.getText().isEmpty()) {
-                    password_employee.setText("Enter password");
-                }
-            }
-        });
-        //selectRole
-        String[] selectRole = {"", "cashier", "admin"};
-        selectRoleComboBox = new JComboBox<>(selectRole);
-        selectRoleComboBox.setBounds(1305, 80,135,35);
-        selectRoleComboBox.setFont(new Font("Arial", Font.PLAIN, 18));
-        selectRoleComboBox.setForeground(Color.black);
-        selectRoleComboBox.setBackground(Color.decode("#24743F"));
-        selectRoleComboBox.setRenderer(new DefaultListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                JComponent c = (JComponent) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                c.setOpaque(true);
-                c.setFont(new Font("Arial", Font.PLAIN, 18));
-                c.setBorder(BorderFactory.createEmptyBorder(5,10,5,0));
-                if (isSelected) {
-                    c.setBackground(Color.decode("#1F9B49")); // Цвет фона
-                    c.setForeground(Color.black); // Цвет текста
-                }
-                else{
-                    c.setBackground(Color.decode("#24743F"));
-                    c.setForeground(Color.black);
-                }
-                if (index == -1 && "".equals(value)) {
-                    setText("Select role");
-                }
-                return this;
-            }
-        });
-        selectRoleComboBox.setSelectedIndex(0);
-        //button
-        send = new JButton("Send");
-        send.setFont(new Font("Arial", Font.PLAIN, 18));
-        send.setForeground(Color.decode("#CADACF")); //color text
-        send.setBackground(Color.decode("#284F00"));  //color background
-        send.setBorder(BorderFactory.createLineBorder(Color.decode("#284F00"), 2));
-        send.setFocusPainted(false);
-        send.setBounds(180, 130,230,35);
-        //textError
-        textError = new JLabel("");
-        textError.setFont(new Font("Arial", Font.PLAIN, 18));
-        textError.setForeground(Color.decode("#000000"));
-        textError.setBounds(180, 210,230,20);
-        //end_temporarily_add_data_for_employee!!!!!!!!!!!!!
-
-
-
-
-
-
-
-
-
         //event_comboBox
         comboBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 JComboBox<String> comboBox = (JComboBox<String>) e.getSource();
                 String selectedText = (String) comboBox.getSelectedItem();
-                deleteComponents();
                 if ("Працівник".equals(selectedText)) {
-                    JButton button1 = new JButton("Кнопка 1");
-                    panel.add(button1);
+                    deleteComponents();
+                    //name_employee
+                    name_employee = new JTextField("Enter name employee");
+                    name_employee.setBounds(420, 80,190,35);
+                    name_employee.setFont(new Font("Arial", Font.PLAIN, 18));
+                    name_employee.setForeground(Color.black);
+                    name_employee.setBackground(Color.decode("#24743F"));
+                    name_employee.setBorder(BorderFactory.createEmptyBorder(5,5,5,0));
+                    name_employee.addFocusListener(new FocusAdapter() {
+                        @Override
+                        public void focusGained(FocusEvent e) {
+                            if (name_employee.getText().equals("Enter name employee")) {
+                                name_employee.setText("");
+                            }
+                        }
+                        @Override
+                        public void focusLost(FocusEvent e) {
+                            if (name_employee.getText().isEmpty()) {
+                                name_employee.setText("Enter name employee");
+                            }
+                        }
+                    });
+                    //telephone_employee
+                    telephone_employee = new JTextField("Telephone (+777-77-77)");
+                    telephone_employee.setBounds(620, 80,220,35);
+                    telephone_employee.setFont(new Font("Arial", Font.PLAIN, 18));
+                    telephone_employee.setForeground(Color.black);
+                    telephone_employee.setBackground(Color.decode("#24743F"));
+                    telephone_employee.setBorder(BorderFactory.createEmptyBorder(5,10,5,0));
+                    telephone_employee.addFocusListener(new FocusAdapter() {
+                        @Override
+                        public void focusGained(FocusEvent e) {
+                            if (telephone_employee.getText().equals("Telephone (+777-77-77)")) {
+                                telephone_employee.setText("");
+                            }
+                        }
+                        @Override
+                        public void focusLost(FocusEvent e) {
+                            if (telephone_employee.getText().isEmpty()) {
+                                telephone_employee.setText("Telephone (+777-77-77)");
+                            }
+                        }
+                    });
+                    //gmail_employee
+                    gmail_employee = new JTextField("Gmail @gmail.com");
+                    gmail_employee.setBounds(850, 80,170,35);
+                    gmail_employee.setFont(new Font("Arial", Font.PLAIN, 18));
+                    gmail_employee.setForeground(Color.black);
+                    gmail_employee.setBackground(Color.decode("#24743F"));
+                    gmail_employee.setBorder(BorderFactory.createEmptyBorder(5,10,5,0));
+                    gmail_employee.addFocusListener(new FocusAdapter() {
+                        @Override
+                        public void focusGained(FocusEvent e) {
+                            if (gmail_employee.getText().equals("Gmail @gmail.com")) {
+                                gmail_employee.setText("");
+                            }
+                        }
+                        @Override
+                        public void focusLost(FocusEvent e) {
+                            if (gmail_employee.getText().isEmpty()) {
+                                gmail_employee.setText("Gmail @gmail.com");
+                            }
+                        }
+                    });
+                    //login_employee
+                    login_employee = new JTextField("Enter login");
+                    login_employee.setBounds(1030, 80,105,35);
+                    login_employee.setFont(new Font("Arial", Font.PLAIN, 18));
+                    login_employee.setForeground(Color.black);
+                    login_employee.setBackground(Color.decode("#24743F"));
+                    login_employee.setBorder(BorderFactory.createEmptyBorder(5,10,5,0));
+                    login_employee.addFocusListener(new FocusAdapter() {
+                        @Override
+                        public void focusGained(FocusEvent e) {
+                            if (login_employee.getText().equals("Enter login")) {
+                                login_employee.setText("");
+                            }
+                        }
+                        @Override
+                        public void focusLost(FocusEvent e) {
+                            if (login_employee.getText().isEmpty()) {
+                                login_employee.setText("Enter login");
+                            }
+                        }
+                    });
+                    //password_employee
+                    password_employee = new JTextField("Enter password");
+                    password_employee.setBounds(1145, 80,150,35);
+                    password_employee.setFont(new Font("Arial", Font.PLAIN, 18));
+                    password_employee.setForeground(Color.black);
+                    password_employee.setBackground(Color.decode("#24743F"));
+                    password_employee.setBorder(BorderFactory.createEmptyBorder(5,10,5,0));
+                    password_employee.addFocusListener(new FocusAdapter() {
+                        @Override
+                        public void focusGained(FocusEvent e) {
+                            if (password_employee.getText().equals("Enter password")) {
+                                password_employee.setText("");
+                            }
+                        }
+                        @Override
+                        public void focusLost(FocusEvent e) {
+                            if (password_employee.getText().isEmpty()) {
+                                password_employee.setText("Enter password");
+                            }
+                        }
+                    });
+                    //selectRole
+                    String[] selectRole = {"", "cashier", "admin"};
+                    selectRoleComboBox = new JComboBox<>(selectRole);
+                    selectRoleComboBox.setBounds(1305, 80,135,35);
+                    selectRoleComboBox.setFont(new Font("Arial", Font.PLAIN, 18));
+                    selectRoleComboBox.setForeground(Color.black);
+                    selectRoleComboBox.setBackground(Color.decode("#24743F"));
+                    selectRoleComboBox.setRenderer(new DefaultListCellRenderer() {
+                        @Override
+                        public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                            JComponent c = (JComponent) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                            c.setOpaque(true);
+                            c.setFont(new Font("Arial", Font.PLAIN, 18));
+                            c.setBorder(BorderFactory.createEmptyBorder(5,10,5,0));
+                            if (isSelected) {
+                                c.setBackground(Color.decode("#1F9B49")); // Цвет фона
+                                c.setForeground(Color.black); // Цвет текста
+                            }
+                            else{
+                                c.setBackground(Color.decode("#24743F"));
+                                c.setForeground(Color.black);
+                            }
+                            if (index == -1 && "".equals(value)) {
+                                setText("Select role");
+                            }
+                            return this;
+                        }
+                    });
+                    selectRoleComboBox.setSelectedIndex(0);
+                    //button
+                    send = new JButton("Send");
+                    send.setFont(new Font("Arial", Font.PLAIN, 18));
+                    send.setForeground(Color.decode("#CADACF")); //color text
+                    send.setBackground(Color.decode("#284F00"));  //color background
+                    send.setBorder(BorderFactory.createLineBorder(Color.decode("#284F00"), 2));
+                    send.setFocusPainted(false);
+                    send.setBounds(180, 130,230,35);
+                    //textError
+                    textError = new JLabel("");
+                    textError.setFont(new Font("Arial", Font.PLAIN, 18));
+                    textError.setForeground(Color.decode("#000000"));
+                    textError.setBounds(180, 210,230,20);
+
+                    panel.add(send); //delete
+                    panel.add(name_employee); //delete
+                    panel.add(telephone_employee); //delete
+                    panel.add(gmail_employee); //delete
+                    panel.add(login_employee); //delete
+                    panel.add(password_employee); //delete
+                    panel.add(selectRoleComboBox); //delete
+                    send.addActionListener(new eventSendDataBase()); //delete
                 }
-                else if ("Валюти".equals(selectedText)) {}
-                else if ("Послуга".equals(selectedText)) {}
-                else if ("Курс обміну".equals(selectedText)) {}
-                else if ("Тариф".equals(selectedText)) {}
-                else if ("Рахунок".equals(selectedText)) {}
-                else if ("Зміна".equals(selectedText)) {}
-                else if ("Сума в касі".equals(selectedText)) {}
-                else if ("Присутність".equals(selectedText)) {}
-                else if ("Валюта та курс обміну".equals(selectedText)) {}
-                else if ("Валюти та послуги".equals(selectedText)) {}
+                else if ("Валюти".equals(selectedText)) {
+                    deleteComponents();
+                    System.out.println("Валюти");
+                }
+                else if ("Послуга".equals(selectedText)) {
+                    deleteComponents();
+                    System.out.println("Послуга");
+                }
+                else if ("Курс обміну".equals(selectedText)) {
+                    deleteComponents();
+                    System.out.println("Курс обміну");
+                }
+                else if ("Тариф".equals(selectedText)) {
+                    deleteComponents();
+                    System.out.println("Тариф");
+                }
+                else if ("Рахунок".equals(selectedText)) {
+                    deleteComponents();
+                    System.out.println("Рахунок");
+                }
+                else if ("Зміна".equals(selectedText)) {
+                    deleteComponents();
+                    System.out.println("Зміна");
+                }
+                else if ("Сума в касі".equals(selectedText)) {
+                    deleteComponents();
+                    System.out.println("Сума в касі");
+                }
+                else if ("Присутність".equals(selectedText)) {
+                    deleteComponents();
+                    System.out.println("Присутність");
+                }
+                else if ("Валюта та курс обміну".equals(selectedText)) {
+                    deleteComponents();
+                    System.out.println("Валюта та курс обміну");
+                }
+                else if ("Валюти та послуги".equals(selectedText)) {
+                    deleteComponents();
+                    System.out.println("Валюти та послуги");
+                }
                 panel.revalidate(); // Mетод используется для того, чтобы сообщить менеджеру компоновки о том, что произошли изменения
                 panel.repaint(); // Mетод запрашивает перерисовку компонента и его дочерних элементов
             }
         });
 
 
-
-
-
-
         //event
         addData.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e) {
-                cardLayout.show(cardPanel, "Add_data");
+            public void mouseClicked(MouseEvent e) {cardLayout.show(cardPanel, "Add_data");
             }
         });
         changeData.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e) {
-                cardLayout.show(cardPanel, "Change_data");
+            public void mouseClicked(MouseEvent e) {cardLayout.show(cardPanel, "Change_data");
             }
         });
         searchData.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e) {
-                cardLayout.show(cardPanel, "Search_data");
+            public void mouseClicked(MouseEvent e) {cardLayout.show(cardPanel, "Search_data");
             }
         });
         deleteData.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e) {
-                cardLayout.show(cardPanel, "Delete_data");
+            public void mouseClicked(MouseEvent e) {cardLayout.show(cardPanel, "Delete_data");
             }
         });
-        panel.add(send); //delete
-        panel.add(name_employee); //delete
-        panel.add(telephone_employee); //delete
-        panel.add(gmail_employee); //delete
-        panel.add(login_employee); //delete
-        panel.add(password_employee); //delete
-        panel.add(selectRoleComboBox); //delete
-        send.addActionListener(new eventSendDataBase()); //delete
 
         panel.add(comboBox);
         panel.add(addData);
@@ -408,51 +408,57 @@ public class adminInterface extends JFrame implements ActionListener{
         }
     }
     private void deleteComponents() {
-        Component[] components = cardPanel.getComponents();
+        System.out.println("\ndeleteComponents"); //delete
+        System.out.println("send: " + send); //delete
+        System.out.println("selectRoleComboBox: " + selectRoleComboBox); //delete
+
+        Component[] components = panel.getComponents();
         for (Component component : components) {
             if (component instanceof JButton) {
                 JButton button = (JButton) component;
                 if (button.equals(send)) {
-                    cardPanel.remove(button);
+                    panel.remove(button);
                 }
             }
             else if (component instanceof JComboBox) {
                 JComboBox<?> box = (JComboBox<?>) component;
                 if (box.equals(selectRoleComboBox)) {
-                    cardPanel.remove(box);
+                    panel.remove(box);
                 }
             }
             else if (component instanceof JLabel) {
                 JLabel jLabel = (JLabel) component;
                 if (jLabel.equals(textError)) {
-                    cardPanel.remove(jLabel);
+                    panel.remove(jLabel);
                 }
             }
             else if (component instanceof JTextField) {
                 JTextField textField = (JTextField) component;
                 if (textField.equals(name_employee)) {
-                    cardPanel.remove(textField);
+                    panel.remove(textField);
                 }
                 else if (textField.equals(telephone_employee)) {
-                    cardPanel.remove(textField);
+                    panel.remove(textField);
                 }
                 else if (textField.equals(gmail_employee)) {
-                    cardPanel.remove(textField);
+                    panel.remove(textField);
                 }
                 else if (textField.equals(login_employee)) {
-                    cardPanel.remove(textField);
+                    panel.remove(textField);
                 }
                 else if (textField.equals(password_employee)) {
-                    cardPanel.remove(textField);
+                    panel.remove(textField);
                 }
             }
         }
+        panel.revalidate();
+        panel.repaint();
     }
     public void addDataInDataBase(String selectedItem, String name, String telephone, String gmail, String login, String password, String role){
         try {
             String sqlAddData;
             if ("Працівник".equals(selectedItem))  {
-                System.out.println("Працівник 111111"); //delete
+                System.out.println("111111 {111111}"); //delete
                 sqlAddData = "INSERT INTO employee(name_employee,telephone_employee,gmail_employee,login_employee," +
                         "password_employee,role_employee)" + "VALUES (" + "\'" + name + "\'," + "\'" + telephone + "\'," + "\'" + gmail + "\'," +
                         "\'" + login + "\'," + "\'" + password + "\'," + "\'" + role + "\'" + ");";
