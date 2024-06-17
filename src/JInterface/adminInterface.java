@@ -5,6 +5,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.font.TextAttribute;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,13 +18,15 @@ import java.sql.*;
 public class adminInterface extends JFrame implements ActionListener{
     private CardLayout cardLayout;
     private JPanel cardPanel, panel;
-    private static JComboBox<String> comboBox, selectRoleComboBox;
-    private static JTextField name_employee, telephone_employee, gmail_employee, login_employee, password_employee;
+    private static JComboBox<String> comboBox, selectRoleComboBox, selectKeyCommissionComboBox;
+    private static JTextField name_employee, telephone_employee, gmail_employee, login_employee, password_employee,
+            name_currency, description_currency, availability_currency,
+            name_service, description_service, sell_price_service, purchased_price_service;
     private static JLabel textError;
     private static JButton send;
     singUpInterface singUpInterface = new singUpInterface();
     Connection conn = singUpInterface.getConnection();
-    String addRole, addRoleRightsCashier, addRoleAdmin, addRoleRightsAdmin;
+    String addRole, addRoleRightsCashier, addRoleRightsAdmin;
 
     public adminInterface(){
         super("ADMIN");
@@ -134,7 +137,6 @@ public class adminInterface extends JFrame implements ActionListener{
             }
         });
         comboBox.setSelectedIndex(0);
-
         //event_comboBox
         comboBox.addActionListener(new ActionListener() {
             @Override
@@ -285,28 +287,278 @@ public class adminInterface extends JFrame implements ActionListener{
                     send.setBorder(BorderFactory.createLineBorder(Color.decode("#284F00"), 2));
                     send.setFocusPainted(false);
                     send.setBounds(180, 130,230,35);
+                    send.addMouseListener(new MouseAdapter() {
+                        public void mousePressed(MouseEvent me) {
+                            send.setForeground(Color.decode("#CADACF")); // меняем цвет текста на черный при нажатии
+                            send.setBackground(Color.decode("#1F9B49"));  //color background
+                        }
+                    });
                     //textError
                     textError = new JLabel("");
                     textError.setFont(new Font("Arial", Font.PLAIN, 18));
                     textError.setForeground(Color.decode("#000000"));
-                    textError.setBounds(180, 210,230,20);
+                    textError.setBounds(180, 190,230,20);
 
-                    panel.add(send); //delete
-                    panel.add(name_employee); //delete
-                    panel.add(telephone_employee); //delete
-                    panel.add(gmail_employee); //delete
-                    panel.add(login_employee); //delete
-                    panel.add(password_employee); //delete
-                    panel.add(selectRoleComboBox); //delete
-                    send.addActionListener(new eventSendDataBase()); //delete
+                    panel.add(textError);
+                    panel.add(send);
+                    panel.add(name_employee);
+                    panel.add(telephone_employee);
+                    panel.add(gmail_employee);
+                    panel.add(login_employee);
+                    panel.add(password_employee);
+                    panel.add(selectRoleComboBox);
+                    send.addActionListener(new eventSendDataBase());
                 }
                 else if ("Валюти".equals(selectedText)) {
                     deleteComponents();
-                    System.out.println("Валюти");
+                    //name_currency
+                    name_currency  = new JTextField("Enter name currency");
+                    name_currency.setBounds(420, 80,190,35);
+                    name_currency.setFont(new Font("Arial", Font.PLAIN, 18));
+                    name_currency.setForeground(Color.black);
+                    name_currency.setBackground(Color.decode("#24743F"));
+                    name_currency.setBorder(BorderFactory.createEmptyBorder(5,5,5,0));
+                    name_currency.addFocusListener(new FocusAdapter() {
+                        @Override
+                        public void focusGained(FocusEvent e) {
+                            if (name_currency.getText().equals("Enter name currency")) {
+                                name_currency.setText("");
+                            }
+                        }
+                        @Override
+                        public void focusLost(FocusEvent e) {
+                            if (name_currency.getText().isEmpty()) {
+                                name_currency.setText("Enter name currency");
+                            }
+                        }
+                    });
+                    //description_currency
+                    description_currency  = new JTextField("Enter description");
+                    description_currency.setBounds(620, 80,190,35);
+                    description_currency.setFont(new Font("Arial", Font.PLAIN, 18));
+                    description_currency.setForeground(Color.black);
+                    description_currency.setBackground(Color.decode("#24743F"));
+                    description_currency.setBorder(BorderFactory.createEmptyBorder(5,5,5,0));
+                    description_currency.addFocusListener(new FocusAdapter() {
+                        @Override
+                        public void focusGained(FocusEvent e) {
+                            if (description_currency.getText().equals("Enter description")) {
+                                description_currency.setText("");
+                            }
+                        }
+                        @Override
+                        public void focusLost(FocusEvent e) {
+                            if (description_currency.getText().isEmpty()) {
+                                description_currency.setText("Enter description");
+                            }
+                        }
+                    });
+                    //availability_currency
+                    availability_currency  = new JTextField("Enter availability");
+                    availability_currency.setBounds(820, 80,180,35);
+                    availability_currency.setFont(new Font("Arial", Font.PLAIN, 18));
+                    availability_currency.setForeground(Color.black);
+                    availability_currency.setBackground(Color.decode("#24743F"));
+                    availability_currency.setBorder(BorderFactory.createEmptyBorder(5,5,5,0));
+                    availability_currency.addFocusListener(new FocusAdapter() {
+                        @Override
+                        public void focusGained(FocusEvent e) {
+                            if (availability_currency.getText().equals("Enter availability")) {
+                                availability_currency.setText("");
+                            }
+                        }
+                        @Override
+                        public void focusLost(FocusEvent e) {
+                            if (availability_currency.getText().isEmpty()) {
+                                availability_currency.setText("Enter availability");
+                            }
+                        }
+                    });
+                    //button
+                    send = new JButton("Send");
+                    send.setFont(new Font("Arial", Font.PLAIN, 18));
+                    send.setForeground(Color.decode("#CADACF")); //color text
+                    send.setBackground(Color.decode("#284F00"));  //color background
+                    send.setBorder(BorderFactory.createLineBorder(Color.decode("#284F00"), 2));
+                    send.setFocusPainted(false);
+                    send.setBounds(180, 130,230,35);
+                    send.addMouseListener(new MouseAdapter() {
+                        public void mousePressed(MouseEvent me) {
+                            send.setForeground(Color.decode("#CADACF")); // меняем цвет текста на черный при нажатии
+                            send.setBackground(Color.decode("#1F9B49"));  //color background
+                        }
+                    });
+                    //textError
+                    textError = new JLabel("");
+                    textError.setFont(new Font("Arial", Font.PLAIN, 18));
+                    textError.setForeground(Color.decode("#000000"));
+                    textError.setBounds(180, 190,230,20);
+
+                    panel.add(textError);
+                    panel.add(name_currency);
+                    panel.add(description_currency);
+                    panel.add(availability_currency);
+                    panel.add(send);
+                    send.addActionListener(new eventSendDataBase());
                 }
                 else if ("Послуга".equals(selectedText)) {
                     deleteComponents();
-                    System.out.println("Послуга");
+                    //name_service
+                    name_service  = new JTextField("Enter name service");
+                    name_service.setBounds(420, 80,190,35);
+                    name_service.setFont(new Font("Arial", Font.PLAIN, 18));
+                    name_service.setForeground(Color.black);
+                    name_service.setBackground(Color.decode("#24743F"));
+                    name_service.setBorder(BorderFactory.createEmptyBorder(5,5,5,0));
+                    name_service.addFocusListener(new FocusAdapter() {
+                        @Override
+                        public void focusGained(FocusEvent e) {
+                            if (name_service.getText().equals("Enter name service")) {
+                                name_service.setText("");
+                            }
+                        }
+                        @Override
+                        public void focusLost(FocusEvent e) {
+                            if (name_service.getText().isEmpty()) {
+                                name_service.setText("Enter name service");
+                            }
+                        }
+                    });
+                    //description_service
+                    description_service  = new JTextField("Enter description");
+                    description_service.setBounds(620, 80,190,35);
+                    description_service.setFont(new Font("Arial", Font.PLAIN, 18));
+                    description_service.setForeground(Color.black);
+                    description_service.setBackground(Color.decode("#24743F"));
+                    description_service.setBorder(BorderFactory.createEmptyBorder(5,5,5,0));
+                    description_service.addFocusListener(new FocusAdapter() {
+                        @Override
+                        public void focusGained(FocusEvent e) {
+                            if (description_service.getText().equals("Enter description")) {
+                                description_service.setText("");
+                            }
+                        }
+                        @Override
+                        public void focusLost(FocusEvent e) {
+                            if (description_service.getText().isEmpty()) {
+                                description_service.setText("Enter description");
+                            }
+                        }
+                    });
+                    //sell_price_service
+                    sell_price_service  = new JTextField("Enter sell price");
+                    sell_price_service.setBounds(820, 80,180,35);
+                    sell_price_service.setFont(new Font("Arial", Font.PLAIN, 18));
+                    sell_price_service.setForeground(Color.black);
+                    sell_price_service.setBackground(Color.decode("#24743F"));
+                    sell_price_service.setBorder(BorderFactory.createEmptyBorder(5,5,5,0));
+                    sell_price_service.addFocusListener(new FocusAdapter() {
+                        @Override
+                        public void focusGained(FocusEvent e) {
+                            if (sell_price_service.getText().equals("Enter sell price")) {
+                                sell_price_service.setText("");
+                            }
+                        }
+                        @Override
+                        public void focusLost(FocusEvent e) {
+                            if (sell_price_service.getText().isEmpty()) {
+                                sell_price_service.setText("Enter sell price");
+                            }
+                        }
+                    });
+                    //purchased_price_service
+                    purchased_price_service  = new JTextField("Enter purchased price");
+                    purchased_price_service.setBounds(1010, 80,200,35);
+                    purchased_price_service.setFont(new Font("Arial", Font.PLAIN, 18));
+                    purchased_price_service.setForeground(Color.black);
+                    purchased_price_service.setBackground(Color.decode("#24743F"));
+                    purchased_price_service.setBorder(BorderFactory.createEmptyBorder(5,5,5,0));
+                    purchased_price_service.addFocusListener(new FocusAdapter() {
+                        @Override
+                        public void focusGained(FocusEvent e) {
+                            if (purchased_price_service.getText().equals("Enter purchased price")) {
+                                purchased_price_service.setText("");
+                            }
+                        }
+                        @Override
+                        public void focusLost(FocusEvent e) {
+                            if (purchased_price_service.getText().isEmpty()) {
+                                purchased_price_service.setText("Enter purchased price");
+                            }
+                        }
+                    });
+                    //textError
+                    textError = new JLabel("");
+                    textError.setFont(new Font("Arial", Font.PLAIN, 18));
+                    textError.setForeground(Color.decode("#000000"));
+                    textError.setBounds(180, 170,290,50);
+
+                    //selectIdCommission
+                    String[] selectKeyCommissionArray = new String[0];
+                    try {
+                        selectKeyCommissionArray = addDataInList().toArray(new String[0]);
+                        if(selectKeyCommissionArray[0] == ""){
+                            textError.setText("Please write data in commission");
+                        }
+                    }
+                    catch (Exception ex) {
+                        System.out.println("Error99: " + ex);
+                        if(ex instanceof NullPointerException){
+                            textError.setText("Please write data in commission");
+                        }
+                    }
+                    selectKeyCommissionComboBox = new JComboBox<>(selectKeyCommissionArray);
+                    selectKeyCommissionComboBox.setBounds(1210, 80,230,35);
+                    selectKeyCommissionComboBox.setFont(new Font("Arial", Font.PLAIN, 18));
+                    selectKeyCommissionComboBox.setForeground(Color.black);
+                    selectKeyCommissionComboBox.setBackground(Color.decode("#24743F"));
+                    selectKeyCommissionComboBox.setRenderer(new DefaultListCellRenderer() {
+                        @Override
+                        public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                            JComponent c = (JComponent) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                            c.setOpaque(true);
+                            c.setFont(new Font("Arial", Font.PLAIN, 18));
+                            c.setBorder(BorderFactory.createEmptyBorder(5,10,5,0));
+                            if (isSelected) {
+                                c.setBackground(Color.decode("#1F9B49")); // Цвет фона
+                                c.setForeground(Color.black); // Цвет текста
+                            }
+                            else{
+                                c.setBackground(Color.decode("#24743F"));
+                                c.setForeground(Color.black);
+                            }
+                            if (index == -1 && "".equals(value)) {
+                                setText("Select key commission");
+                            }
+                            return this;
+                        }
+                    });
+                    selectKeyCommissionComboBox.setSelectedIndex(0);
+                    //send
+                    send = new JButton("Send");
+                    send.setFont(new Font("Arial", Font.PLAIN, 18));
+                    send.setForeground(Color.decode("#CADACF")); //color text
+                    send.setBackground(Color.decode("#284F00"));  //color background
+                    send.setBorder(BorderFactory.createLineBorder(Color.decode("#284F00"), 2));
+                    send.setFocusPainted(false);
+                    send.setBounds(180, 130,230,35);
+                    send.addMouseListener(new MouseAdapter() {
+                        public void mousePressed(MouseEvent me) {
+                            send.setForeground(Color.decode("#CADACF")); // меняем цвет текста на черный при нажатии
+                            send.setBackground(Color.decode("#1F9B49"));  //color background
+                        }
+                    });
+
+                    panel.add(name_service);
+                    panel.add(description_service);
+
+                    panel.add(sell_price_service);
+                    panel.add(purchased_price_service);
+
+                    panel.add(selectKeyCommissionComboBox);
+                    panel.add(textError);
+                    panel.add(send);
+                    send.addActionListener(new eventSendDataBase());
                 }
                 else if ("Курс обміну".equals(selectedText)) {
                     deleteComponents();
@@ -345,27 +597,22 @@ public class adminInterface extends JFrame implements ActionListener{
             }
         });
 
-
         //event
         addData.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e) {cardLayout.show(cardPanel, "Add_data");
-            }
+            public void mouseClicked(MouseEvent e) {cardLayout.show(cardPanel, "Add_data");}
         });
         changeData.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e) {cardLayout.show(cardPanel, "Change_data");
-            }
+            public void mouseClicked(MouseEvent e) {cardLayout.show(cardPanel, "Change_data");}
         });
         searchData.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e) {cardLayout.show(cardPanel, "Search_data");
-            }
+            public void mouseClicked(MouseEvent e) {cardLayout.show(cardPanel, "Search_data");}
         });
         deleteData.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e) {cardLayout.show(cardPanel, "Delete_data");
-            }
+            public void mouseClicked(MouseEvent e) {cardLayout.show(cardPanel, "Delete_data");}
         });
 
         panel.add(comboBox);
@@ -383,6 +630,7 @@ public class adminInterface extends JFrame implements ActionListener{
             try{
                 String selectedItem = (String) comboBox.getSelectedItem();
                 if ("Працівник".equals(selectedItem)) {
+                    System.out.println("Працівник eventSendDataBase");
                     String name = name_employee.getText().trim();
                     String telephone = telephone_employee.getText().trim();
                     String gmail = gmail_employee.getText().trim();
@@ -391,8 +639,62 @@ public class adminInterface extends JFrame implements ActionListener{
                     String role = (String) selectRoleComboBox.getSelectedItem();
                     addDataInDataBase(selectedItem, name, telephone, gmail, login, password, role);
                 }
-                else if("Валюти".equals(selectedItem)){}
-                else if("Послуга".equals(selectedItem)){}
+                else if("Валюти".equals(selectedItem)){
+                    System.out.println("Валюти eventSendDataBase");
+
+                    String nameCurrency = name_currency.getText().trim();
+                    String desCurrency = description_currency.getText().trim();
+                    String strAvailCurrency = availability_currency.getText().trim();
+
+                    //System.out.println("nameCurrency: " + nameCurrency); //delete
+                    //System.out.println("desCurrency: " + desCurrency); //delete
+                    //System.out.println("availCurrency: " + strAvailCurrency); //delete
+
+                    if(nameCurrency.equals("Enter name currency") || desCurrency.equals("Enter description")){
+                        textError.setText("Please write data");
+                        System.out.println("nameCurrency {111}"); //delete
+                    }
+                    else if(strAvailCurrency.equals("Enter availability")){
+                        textError.setText("Please write number");
+                        System.out.println("nameCurrency {222}"); //delete
+                    }
+                    else {
+                        System.out.println("nameCurrency {333}"); //delete
+                        int availCurrency = Integer.parseInt(strAvailCurrency);
+                        addDataInDataBase(selectedItem, nameCurrency, desCurrency, availCurrency);
+                    }
+                }
+                else if("Послуга".equals(selectedItem)){
+                    System.out.println("Послуга eventSendDataBase");
+
+                    String nameService = name_service.getText().trim();
+                    String desService = description_service.getText().trim();
+                    String strSellPriceService = sell_price_service.getText().trim();
+                    String strPurchasedPriceService = purchased_price_service.getText().trim();
+                    String keyCommission = (String) selectKeyCommissionComboBox.getSelectedItem();
+
+                    if(nameService.equals("Enter name service") || desService.equals("Enter description")){
+                        textError.setText("");
+                        textError.setText("Please write data");
+                        System.out.println("nameService {111}"); //delete
+                    }
+                    else if(strSellPriceService.equals("Enter sell price") || strPurchasedPriceService.equals("Enter purchased price")){
+                        textError.setText("");
+                        textError.setText("Please write number");
+                        System.out.println("nameService {222}"); //delete
+                    }
+                    else if(keyCommission.equals("Select key commission")){
+                        textError.setText("");
+                        textError.setText("Please select key commission");
+                        System.out.println("nameService {333}"); //delete
+                    }
+                    else {
+                        System.out.println("nameService {444}"); //delete
+                        int sellPriceService = Integer.parseInt(strSellPriceService);
+                        int purchasedPriceService = Integer.parseInt(strPurchasedPriceService);
+                        addDataInDataBase(selectedItem, nameService, desService, sellPriceService,purchasedPriceService, keyCommission);
+                    }
+                }
                 else if("Курс обміну".equals(selectedItem)){}
                 else if("Тариф".equals(selectedItem)){}
                 else if("Рахунок".equals(selectedItem)){}
@@ -403,14 +705,14 @@ public class adminInterface extends JFrame implements ActionListener{
                 else if("Валюти та послуги".equals(selectedItem)){}
             }
             catch (Exception ex){
-                System.out.println("Error: " + ex);
+                System.out.println("Error909: " + ex);
             }
         }
     }
     private void deleteComponents() {
-        System.out.println("\ndeleteComponents"); //delete
-        System.out.println("send: " + send); //delete
-        System.out.println("selectRoleComboBox: " + selectRoleComboBox); //delete
+        System.out.println("deleteComponents"); //delete
+        //System.out.println("send: " + send); //delete
+        //System.out.println("selectRoleComboBox: " + selectRoleComboBox); //delete
 
         Component[] components = panel.getComponents();
         for (Component component : components) {
@@ -423,6 +725,10 @@ public class adminInterface extends JFrame implements ActionListener{
             else if (component instanceof JComboBox) {
                 JComboBox<?> box = (JComboBox<?>) component;
                 if (box.equals(selectRoleComboBox)) {
+                    panel.remove(box);
+                }
+                //service
+                else if (box.equals(selectKeyCommissionComboBox)) {
                     panel.remove(box);
                 }
             }
@@ -449,15 +755,65 @@ public class adminInterface extends JFrame implements ActionListener{
                 else if (textField.equals(password_employee)) {
                     panel.remove(textField);
                 }
+                //currency
+                else if (textField.equals(name_currency)) {
+                    panel.remove(textField);
+                }
+                else if (textField.equals(availability_currency)) {
+                    panel.remove(textField);
+                }
+                else if (textField.equals(description_currency)) {
+                    panel.remove(textField);
+                }
+                //service
+                else if (textField.equals(name_service)) {
+                    panel.remove(textField);
+                }
+                else if (textField.equals(description_service)) {
+                    panel.remove(textField);
+                }
+                else if (textField.equals(sell_price_service)) {
+                    panel.remove(textField);
+                }
+                else if (textField.equals(purchased_price_service)) {
+                    panel.remove(textField);
+                }
             }
         }
         panel.revalidate();
         panel.repaint();
     }
-    public void addDataInDataBase(String selectedItem, String name, String telephone, String gmail, String login, String password, String role){
+    private ArrayList<String> addDataInList() throws SQLException{
+        ArrayList<String> selectIdCommission = new ArrayList<>();
         try {
-            String sqlAddData;
-            if ("Працівник".equals(selectedItem))  {
+            String getIdCommission = "SELECT id_commission FROM commission;";
+            Statement statement = conn.createStatement();
+            System.out.println("resulIdCommission: " + statement.executeQuery(getIdCommission));
+            ResultSet resulIdCommission = statement.executeQuery(getIdCommission);
+            while (resulIdCommission.next()) {
+                selectIdCommission.add(resulIdCommission.getString("id_commission"));
+            }
+        }
+        catch(Exception ex){
+            System.out.println("Error addDataInList: " + ex);
+            if(ex instanceof NullPointerException){
+                selectIdCommission.add("");
+            }
+        }
+        return selectIdCommission;
+    }
+    public void addDataInDataBase(Object... dataForDataBase){
+        try {
+            Object stringPoint = dataForDataBase[0];
+            String addCurrencyDataBase, sqlAddData;
+            if ("Працівник".equals(stringPoint))  {
+                Object name = dataForDataBase[1];
+                Object telephone = dataForDataBase[2];
+                Object gmail = dataForDataBase[3];
+                Object login = dataForDataBase[4];
+                Object password = dataForDataBase[5];
+                Object role = dataForDataBase[6];
+
                 System.out.println("111111 {111111}"); //delete
                 sqlAddData = "INSERT INTO employee(name_employee,telephone_employee,gmail_employee,login_employee," +
                         "password_employee,role_employee)" + "VALUES (" + "\'" + name + "\'," + "\'" + telephone + "\'," + "\'" + gmail + "\'," +
@@ -480,6 +836,8 @@ public class adminInterface extends JFrame implements ActionListener{
                 String checkDataLogin = "SELECT login_employee FROM employee WHERE login_employee=\'" + login + "\';";
                 String checkDataPassword = "SELECT password_employee FROM employee WHERE password_employee=\'" + password + "\';";
 
+                System.out.println("Працівник 111111{00000}"); //delete
+
                 Statement statement = conn.createStatement();
                 ResultSet resultName = statement.executeQuery(checkDataName);
                 Statement statement1 = conn.createStatement();
@@ -490,35 +848,46 @@ public class adminInterface extends JFrame implements ActionListener{
                 ResultSet resultTelephone = statement3.executeQuery(checkDataTelephone);
 
                 if (!resultName.next() && !resultLogin.next() && !resultPassword.next() && !resultTelephone.next()) {
-                    if("cashier".equals(role)) {
+                    if("cashier".equals(role) && !"Enter name employee".equals(name) && !"Telephone (+777-77-77)".equals(telephone) && !"Enter login".equals(login) && !"Enter password".equals(password)) {
                         statement.executeUpdate(sqlAddData);
                         statement.executeUpdate(addRole);
                         statement.executeUpdate(addRoleRightsCashier);
                         System.out.println("Працівник 111111{11111}"); //delete
+                        textError.setText("");
                         textError.setText("Add data in Data Base");
                     }
-                    else if("admin".equals(role)) {
+                    else if("admin".equals(role) && !"Enter name employee".equals(name) && !"Telephone (+777-77-77)".equals(telephone) && !"Enter login".equals(login) && !"Enter password".equals(password)) {
                         statement.executeUpdate(sqlAddData);
                         statement.executeUpdate(addRole);
                         statement.executeUpdate(addRoleRightsAdmin);
                         System.out.println("Працівник 111111{22222}"); //delete
+                        textError.setText("");
                         textError.setText("Add data in Data Base");
+                    }
+                    else{
+                        textError.setText("");
+                        textError.setText("Not add data in Data Base");
                     }
                 }
                 else{
                     if(!resultName.next()){
+                        textError.setText("");
                         textError.setText("This name where in Database");
                     }
-                    if(!resultLogin.next()){
+                    else if(!resultLogin.next()){
+                        textError.setText("");
                         textError.setText("This login where in Database");
                     }
-                    if(!resultPassword.next()){
+                    else if(!resultPassword.next()){
+                        textError.setText("");
                         textError.setText("This password where in Database");
                     }
-                    if(!resultTelephone.next()){
+                    else if(!resultTelephone.next()){
+                        textError.setText("");
                         textError.setText("This name telephone in Database");
                     }
                     else{
+                        textError.setText("");
                         textError.setText("This data in Database");
                     }
                 }
@@ -527,38 +896,111 @@ public class adminInterface extends JFrame implements ActionListener{
                 statement2.close();
                 statement3.close();
             }
-            else if("Валюти".equals(selectedItem)){}
-            else if("Послуга".equals(selectedItem)){}
-            else if("Курс обміну".equals(selectedItem)){}
-            else if("Тариф".equals(selectedItem)){}
-            else if("Рахунок".equals(selectedItem)){}
-            else if("Зміна".equals(selectedItem)){}
-            else if("Сума в касі".equals(selectedItem)){}
-            else if("Присутність".equals(selectedItem)){}
-            else if("Валюта та курс обміну".equals(selectedItem)){}
-            else if("Валюти та послуги".equals(selectedItem)){}
+            else if("Валюти".equals(stringPoint)){
+                System.out.println("Валюта 111111{11111}"); //delete
+                Object nameCurrency = dataForDataBase[1];
+                Object desCurrency = dataForDataBase[2];
+                Object availCurrency = dataForDataBase[3];
+
+                addCurrencyDataBase = "INSERT INTO currency(name_currency, description_currency, availability_currency) VALUES (\'" + nameCurrency + "\', \'" +  desCurrency + "\', \'" + availCurrency + "\');";
+                //check data
+                String checkNameCurrency = "SELECT name_currency FROM currency WHERE name_currency = \'" + nameCurrency + "\';";
+                String checkDesCurrency = "SELECT description_currency FROM currency WHERE description_currency = \'" + desCurrency + "\';";
+                //statement
+                Statement statement = conn.createStatement();
+                ResultSet resultName = statement.executeQuery(checkNameCurrency);
+                Statement statement1 = conn.createStatement();
+                ResultSet resultDescription = statement1.executeQuery(checkDesCurrency);
+
+                if (!resultName.next() && !resultDescription.next()) {
+                    if(!"Enter name currency".equals(nameCurrency) && !"Enter availability".equals(availCurrency)) {
+                        statement.executeUpdate(addCurrencyDataBase);
+                        textError.setText("Add data in Data Base");
+                        System.out.println("Валюта 111111{22222}"); //delete
+                    }
+                    else{
+                        textError.setText("Not add data in Data Base");
+                    }
+                }
+                else{
+                    if(!resultName.next()){
+                        textError.setText("This name where in Database");
+                    }
+                    else if(!resultDescription.next()){
+                        textError.setText("This description where in Database");
+                    }
+                    else{
+                        textError.setText("This data in Database");
+                    }
+                }
+                statement.close();
+                statement1.close();
+            }
+            else if("Послуга".equals(stringPoint)){
+                System.out.println("Послуга 111111{11111}"); //delete
+                Object nameService = dataForDataBase[1];
+                Object desService = dataForDataBase[2];
+                Object sellAvailCurrency = dataForDataBase[3];
+                Object purchasedAvailCurrency = dataForDataBase[4];
+                Object keyCommission = dataForDataBase[5];
+
+                addCurrencyDataBase = "INSERT INTO service(id_commission, name_service, description_service, sell_price_service, purchased_price_service) VALUES ("
+                        +  keyCommission + ", \'" + nameService + "\', \'" + desService + "\'," + sellAvailCurrency + "," + purchasedAvailCurrency + ");";
+
+                //check data
+                String checkNameService = "SELECT name_service FROM service WHERE name_service = \'" + nameService + "\';";
+                String checkDesService = "SELECT description_service FROM service WHERE description_service = \'" + desService + "\';";
+                //statement
+                Statement statement = conn.createStatement();
+                ResultSet resultName = statement.executeQuery(checkNameService);
+                Statement statement1 = conn.createStatement();
+                ResultSet resultDescription = statement1.executeQuery(checkDesService);
+
+                if (!resultName.next() && !resultDescription.next()) {
+                    if(!"Enter name service".equals(nameService) && !"Enter sell price".equals(sellAvailCurrency) && !"Enter purchased price".equals(purchasedAvailCurrency) && !"Select key commission".equals(keyCommission)) {
+                        statement.executeUpdate(addCurrencyDataBase);
+                        textError.setText("");
+                        textError.setText("Add data in Data Base");
+                        System.out.println("Послуга 111111{22222}"); //delete
+                    }
+                    else{
+                        textError.setText("");
+                        textError.setText("Not add data in Data Base");
+                    }
+                }
+                else{
+                    if(!resultName.next()){
+                        textError.setText("");
+                        textError.setText("This name where in Database");
+                    }
+                    else if(!resultDescription.next()){
+                        textError.setText("");
+                        textError.setText("This description where in Database");
+                    }
+                    else{
+                        textError.setText("");
+                        textError.setText("This data in Database");
+                    }
+                }
+                statement.close();
+                statement1.close();
+
+            }
+            else if("Курс обміну".equals(stringPoint)){}
+            else if("Тариф".equals(stringPoint)){}
+            else if("Рахунок".equals(stringPoint)){}
+            else if("Зміна".equals(stringPoint)){}
+            else if("Сума в касі".equals(stringPoint)){}
+            else if("Присутність".equals(stringPoint)){}
+            else if("Валюта та курс обміну".equals(stringPoint)){}
+            else if("Валюти та послуги".equals(stringPoint)){}
         }
         catch (Exception ex){
             System.out.println("Errror: " + ex);
+            textError.setText("Please write correct data");
+            textError.setText("Please write correct data");
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

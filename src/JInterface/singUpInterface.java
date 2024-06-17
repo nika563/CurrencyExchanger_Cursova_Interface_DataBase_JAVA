@@ -36,7 +36,6 @@ public class singUpInterface extends JFrame {
         header.setFont(new Font("Arial",  Font.BOLD, 20));
         header.setForeground(Color.black);
         header.setBounds(250, 20,100, 50);
-
         //login
         JLabel loginText = new JLabel("Login:");
         loginText.setFont(new Font("Arial", Font.PLAIN, 18));
@@ -119,7 +118,7 @@ public class singUpInterface extends JFrame {
                     if (user.equals(username) && pass.equals(password)) {
                         conn = DriverManager.getConnection(url, username, password);
                         textError.setText("Connection successful!");
-                        System.out.println("Connection successful! 11111"); //delete
+                        System.out.println("Connection successful!"); //delete
                         openInterface.closeForm();
                         addNewLoginPassword = true;
 
@@ -208,7 +207,7 @@ public class singUpInterface extends JFrame {
     }
 
     public Connection getConnection() {
-        System.out.println("conn{000}: " + conn);
+        System.out.println("conn{000}: " + conn); //delete
         return conn;
     }
 }
