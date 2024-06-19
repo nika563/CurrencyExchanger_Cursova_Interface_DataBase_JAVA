@@ -12,18 +12,32 @@ import java.util.Map;
 import javax.swing.border.MatteBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.CompoundBorder;
+import com.toedter.calendar.JCalendar;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Calendar;
 //sql
 import java.sql.*;
 
 public class adminInterface extends JFrame implements ActionListener{
     private CardLayout cardLayout;
     private JPanel cardPanel, panel;
-    private static JComboBox<String> comboBox, selectRoleComboBox, selectKeyCommissionComboBox;
+    private static JComboBox<String> comboBox, selectRoleComboBox, selectKeyCommissionComboBox, selectKeyEmployeeShiftComboBox,
+            selectKeyCurrencyCashRegisterComboBox, selectKeyShiftCashRegisterComboBox;
     private static JTextField name_employee, telephone_employee, gmail_employee, login_employee, password_employee,
             name_currency, description_currency, availability_currency,
-            name_service, description_service, sell_price_service, purchased_price_service;
+            name_service, description_service, sell_price_service, purchased_price_service,
+            name_commission, price_commission,
+            price_hour_shift,
+            start_price_cash_register, end_price_cash_register;
     private static JLabel textError;
     private static JButton send;
+    private static JCalendar calendar_exchanger_rate, start_calendar_shift, end_calendar_shift,
+            start_actual_calendar, end_actual_calendar;
+    private static JSpinner timeSpinner, startTimeShift, endTimeShift;
+    private static JSpinner.DateEditor textField;
+    private static JFormattedTextField time_exchanger_rate, start_time_shift, end_time_shift,
+            start_actual_time, end_actual_time, presence_time;
     singUpInterface singUpInterface = new singUpInterface();
     Connection conn = singUpInterface.getConnection();
     String addRole, addRoleRightsCashier, addRoleRightsAdmin;
@@ -67,7 +81,6 @@ public class adminInterface extends JFrame implements ActionListener{
                 new MatteBorder(0, 0, 2, 0, Color.BLACK), // Нижняя граница
                 new EmptyBorder(0, 16, 15, 0) // Отступы
         );
-
         //Menu admin
         JLabel header = new JLabel("Menu admin".toUpperCase());
         Font currentFontHeader = header.getFont(); // Получаем текущий шрифт метки
@@ -109,7 +122,7 @@ public class adminInterface extends JFrame implements ActionListener{
         deleteData.setForeground(Color.black);
         deleteData.setBounds(0, 180,150,40);
         //comboBox
-        String[] menuItems = {"", "Працівник", "Валюти", "Послуга", "Курс обміну", "Тариф", "Рахунок", "Зміна", "Сума в касі", "Присутність", "Валюта та курс обміну", "Валюти та послуги"};
+        String[] menuItems = {"", "Працівник", "Валюти", "Послуга", "Курс обміну", "Тариф", "Зміна", "Сума в касі", "Присутність", "Валюта та курс обміну", "Валюти та послуги"};
         comboBox = new JComboBox<>(menuItems);
         comboBox.setBounds(180, 80,230,35);
         comboBox.setFont(new Font("Arial", Font.PLAIN, 18));
@@ -494,46 +507,43 @@ public class adminInterface extends JFrame implements ActionListener{
                     textError.setBounds(180, 170,290,50);
 
                     //selectIdCommission
-                    String[] selectKeyCommissionArray = new String[0];
+                    String[] selectKeyCommissionArray;
                     try {
-                        selectKeyCommissionArray = addDataInList().toArray(new String[0]);
-                        if(selectKeyCommissionArray[0] == ""){
-                            textError.setText("Please write data in commission");
-                        }
+                        selectKeyCommissionArray = addDataInList().toArray(new String[0]);;
+                        selectKeyCommissionComboBox = new JComboBox<>(selectKeyCommissionArray);
+                        selectKeyCommissionComboBox.setBounds(1220, 80,230,35);
+                        selectKeyCommissionComboBox.setFont(new Font("Arial", Font.PLAIN, 18));
+                        selectKeyCommissionComboBox.setForeground(Color.black);
+                        selectKeyCommissionComboBox.setBackground(Color.decode("#24743F"));
+                        selectKeyCommissionComboBox.setRenderer(new DefaultListCellRenderer() {
+                            @Override
+                            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                                JComponent c = (JComponent) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                                c.setOpaque(true);
+                                c.setFont(new Font("Arial", Font.PLAIN, 18));
+                                c.setBorder(BorderFactory.createEmptyBorder(5,10,5,0));
+                                if (isSelected) {
+                                    c.setBackground(Color.decode("#1F9B49")); // Цвет фона
+                                    c.setForeground(Color.black); // Цвет текста
+                                }
+                                else{
+                                    c.setBackground(Color.decode("#24743F"));
+                                    c.setForeground(Color.black);
+                                }
+                                if (index == -1 && "".equals(value)) {
+                                    setText("Select key commission");
+                                }
+                                return this;
+                            }
+                        });
+                        selectKeyCommissionComboBox.setSelectedIndex(0);
                     }
                     catch (Exception ex) {
                         System.out.println("Error99: " + ex);
-                        if(ex instanceof NullPointerException){
+                        if(ex instanceof ArrayIndexOutOfBoundsException){
                             textError.setText("Please write data in commission");
                         }
                     }
-                    selectKeyCommissionComboBox = new JComboBox<>(selectKeyCommissionArray);
-                    selectKeyCommissionComboBox.setBounds(1210, 80,230,35);
-                    selectKeyCommissionComboBox.setFont(new Font("Arial", Font.PLAIN, 18));
-                    selectKeyCommissionComboBox.setForeground(Color.black);
-                    selectKeyCommissionComboBox.setBackground(Color.decode("#24743F"));
-                    selectKeyCommissionComboBox.setRenderer(new DefaultListCellRenderer() {
-                        @Override
-                        public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                            JComponent c = (JComponent) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                            c.setOpaque(true);
-                            c.setFont(new Font("Arial", Font.PLAIN, 18));
-                            c.setBorder(BorderFactory.createEmptyBorder(5,10,5,0));
-                            if (isSelected) {
-                                c.setBackground(Color.decode("#1F9B49")); // Цвет фона
-                                c.setForeground(Color.black); // Цвет текста
-                            }
-                            else{
-                                c.setBackground(Color.decode("#24743F"));
-                                c.setForeground(Color.black);
-                            }
-                            if (index == -1 && "".equals(value)) {
-                                setText("Select key commission");
-                            }
-                            return this;
-                        }
-                    });
-                    selectKeyCommissionComboBox.setSelectedIndex(0);
                     //send
                     send = new JButton("Send");
                     send.setFont(new Font("Arial", Font.PLAIN, 18));
@@ -551,10 +561,8 @@ public class adminInterface extends JFrame implements ActionListener{
 
                     panel.add(name_service);
                     panel.add(description_service);
-
                     panel.add(sell_price_service);
                     panel.add(purchased_price_service);
-
                     panel.add(selectKeyCommissionComboBox);
                     panel.add(textError);
                     panel.add(send);
@@ -562,27 +570,553 @@ public class adminInterface extends JFrame implements ActionListener{
                 }
                 else if ("Курс обміну".equals(selectedText)) {
                     deleteComponents();
-                    System.out.println("Курс обміну");
+                    //calendar_exchanger_rate
+                    calendar_exchanger_rate = new JCalendar();
+                    calendar_exchanger_rate.setBounds(420, 80,260,210);
+                    calendar_exchanger_rate.setFont(new Font("Arial", Font.PLAIN, 18));
+                    calendar_exchanger_rate.setForeground(Color.black);
+                    calendar_exchanger_rate.setBackground(Color.decode("#24743F"));
+                    calendar_exchanger_rate.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+                    //time_exchanger_rate
+                    Date initialDate = new Date();
+                    SpinnerDateModel spinnerModel = new SpinnerDateModel(initialDate, null, null, Calendar.HOUR_OF_DAY);
+                    timeSpinner  = new JSpinner(spinnerModel);
+                    textField = new JSpinner.DateEditor(timeSpinner , "HH:mm:ss");
+                    timeSpinner.setEditor(textField);
+                    time_exchanger_rate = ((JSpinner.DefaultEditor) timeSpinner.getEditor()).getTextField();
+                    time_exchanger_rate.setBounds(690, 80,110,40);
+                    time_exchanger_rate.setFont(new Font("Arial", Font.PLAIN, 18));
+                    time_exchanger_rate.setForeground(Color.black);
+                    time_exchanger_rate.setBackground(Color.decode("#24743F"));
+                    time_exchanger_rate.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+                    //textError
+                    textError = new JLabel("");
+                    textError.setFont(new Font("Arial", Font.PLAIN, 18));
+                    textError.setForeground(Color.decode("#000000"));
+                    textError.setBounds(180, 170,290,50);
+                    //send
+                    send = new JButton("Send");
+                    send.setFont(new Font("Arial", Font.PLAIN, 18));
+                    send.setForeground(Color.decode("#CADACF")); //color text
+                    send.setBackground(Color.decode("#284F00"));  //color background
+                    send.setBorder(BorderFactory.createLineBorder(Color.decode("#284F00"), 2));
+                    send.setFocusPainted(false);
+                    send.setBounds(180, 130,230,35);
+                    send.addMouseListener(new MouseAdapter() { public void mousePressed(MouseEvent me) {
+                            send.setForeground(Color.decode("#CADACF")); // меняем цвет текста на черный при нажатии
+                            send.setBackground(Color.decode("#1F9B49"));  //color background
+                        } });
+
+                    panel.add(calendar_exchanger_rate);
+                    panel.add(time_exchanger_rate);
+                    panel.add(textError);
+                    panel.add(send);
+                    send.addActionListener(new eventSendDataBase());
                 }
                 else if ("Тариф".equals(selectedText)) {
                     deleteComponents();
                     System.out.println("Тариф");
-                }
-                else if ("Рахунок".equals(selectedText)) {
-                    deleteComponents();
-                    System.out.println("Рахунок");
+                    //name_commission
+                    name_commission  = new JTextField("Enter name commission");
+                    name_commission.setBounds(420, 80,220,35);
+                    name_commission.setFont(new Font("Arial", Font.PLAIN, 18));
+                    name_commission.setForeground(Color.black);
+                    name_commission.setBackground(Color.decode("#24743F"));
+                    name_commission.setBorder(BorderFactory.createEmptyBorder(5,5,5,0));
+                    name_commission.addFocusListener(new FocusAdapter() {
+                        @Override
+                        public void focusGained(FocusEvent e) {
+                            if (name_commission.getText().equals("Enter name commission")) {
+                                name_commission.setText("");
+                            }
+                        }
+                        @Override
+                        public void focusLost(FocusEvent e) {
+                            if (name_commission.getText().isEmpty()) {
+                                name_commission.setText("Enter name commission");
+                            }
+                        }
+                    });
+                    //purchased_price_service
+                    price_commission  = new JTextField("Enter price commission");
+                    price_commission.setBounds(650, 80,210,35);
+                    price_commission.setFont(new Font("Arial", Font.PLAIN, 18));
+                    price_commission.setForeground(Color.black);
+                    price_commission.setBackground(Color.decode("#24743F"));
+                    price_commission.setBorder(BorderFactory.createEmptyBorder(5,5,5,0));
+                    price_commission.addFocusListener(new FocusAdapter() {
+                        @Override
+                        public void focusGained(FocusEvent e) {
+                            if (price_commission.getText().equals("Enter price commission")) {
+                                price_commission.setText("");
+                            }
+                        }
+                        @Override
+                        public void focusLost(FocusEvent e) {
+                            if (price_commission.getText().isEmpty()) {
+                                price_commission.setText("Enter price commission");
+                            }
+                        }
+                    });
+                    //textError
+                    textError = new JLabel("");
+                    textError.setFont(new Font("Arial", Font.PLAIN, 18));
+                    textError.setForeground(Color.decode("#000000"));
+                    textError.setBounds(180, 170,290,50);
+                    //send
+                    send = new JButton("Send");
+                    send.setFont(new Font("Arial", Font.PLAIN, 18));
+                    send.setForeground(Color.decode("#CADACF")); //color text
+                    send.setBackground(Color.decode("#284F00"));  //color background
+                    send.setBorder(BorderFactory.createLineBorder(Color.decode("#284F00"), 2));
+                    send.setFocusPainted(false);
+                    send.setBounds(180, 130,230,35);
+                    send.addMouseListener(new MouseAdapter() {
+                        public void mousePressed(MouseEvent me) {
+                            send.setForeground(Color.decode("#CADACF")); // меняем цвет текста на черный при нажатии
+                            send.setBackground(Color.decode("#1F9B49"));  //color background
+                        }
+                    });
+
+                    panel.add(name_commission);
+                    panel.add(price_commission);
+                    panel.add(textError);
+                    panel.add(send);
+                    send.addActionListener(new eventSendDataBase());
                 }
                 else if ("Зміна".equals(selectedText)) {
                     deleteComponents();
                     System.out.println("Зміна");
+                    //start_calendar_shift
+                    start_calendar_shift = new JCalendar();
+                    start_calendar_shift.setBounds(420, 80,260,210);
+                    start_calendar_shift.setFont(new Font("Arial", Font.PLAIN, 18));
+                    start_calendar_shift.setForeground(Color.black);
+                    start_calendar_shift.setBackground(Color.decode("#24743F"));
+                    start_calendar_shift.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+                    //time_exchanger_rate
+                    Date initialDate = new Date();
+                    SpinnerDateModel spinnerModel = new SpinnerDateModel(initialDate, null, null, Calendar.HOUR_OF_DAY);
+                    startTimeShift  = new JSpinner(spinnerModel);
+                    textField = new JSpinner.DateEditor(startTimeShift , "HH:mm:ss");
+                    startTimeShift.setEditor(textField);
+                    start_time_shift = ((JSpinner.DefaultEditor) startTimeShift.getEditor()).getTextField();
+                    start_time_shift.setBounds(690, 80,110,40);
+                    start_time_shift.setFont(new Font("Arial", Font.PLAIN, 18));
+                    start_time_shift.setForeground(Color.black);
+                    start_time_shift.setBackground(Color.decode("#24743F"));
+                    start_time_shift.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+
+                    //end_calendar_shift
+                    end_calendar_shift = new JCalendar();
+                    end_calendar_shift.setBounds(820, 80,260,210);
+                    end_calendar_shift.setFont(new Font("Arial", Font.PLAIN, 18));
+                    end_calendar_shift.setForeground(Color.black);
+                    end_calendar_shift.setBackground(Color.decode("#24743F"));
+                    end_calendar_shift.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+                    //end_time_shift
+                    Date initialDate01 = new Date();
+                    SpinnerDateModel spinnerModel01 = new SpinnerDateModel(initialDate01, null, null, Calendar.HOUR_OF_DAY);
+                    endTimeShift  = new JSpinner(spinnerModel01);
+                    textField = new JSpinner.DateEditor(endTimeShift , "HH:mm:ss");
+                    endTimeShift.setEditor(textField);
+                    end_time_shift = ((JSpinner.DefaultEditor) endTimeShift.getEditor()).getTextField();
+                    end_time_shift.setBounds(1090, 80,110,40);
+                    end_time_shift.setFont(new Font("Arial", Font.PLAIN, 18));
+                    end_time_shift.setForeground(Color.black);
+                    end_time_shift.setBackground(Color.decode("#24743F"));
+                    end_time_shift.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+                    //price_hour_shift
+                    price_hour_shift  = new JTextField("Enter hour price shift");
+                    price_hour_shift.setBounds(1210, 80,210,35);
+                    price_hour_shift.setFont(new Font("Arial", Font.PLAIN, 18));
+                    price_hour_shift.setForeground(Color.black);
+                    price_hour_shift.setBackground(Color.decode("#24743F"));
+                    price_hour_shift.setBorder(BorderFactory.createEmptyBorder(5,5,5,0));
+                    price_hour_shift.addFocusListener(new FocusAdapter() {
+                        @Override
+                        public void focusGained(FocusEvent e) {
+                            if (price_hour_shift.getText().equals("Enter hour price shift")) {
+                                price_hour_shift.setText("");
+                            }
+                        }
+                        @Override
+                        public void focusLost(FocusEvent e) {
+                            if (price_hour_shift.getText().isEmpty()) {
+                                price_hour_shift.setText("Enter hour price shift");
+                            }
+                        }
+                    });
+                    //textError
+                    textError = new JLabel("");
+                    textError.setFont(new Font("Arial", Font.PLAIN, 18));
+                    textError.setForeground(Color.decode("#000000"));
+                    textError.setBounds(180, 170,290,50);
+
+                    //selectIdEmployee
+                    String[] selectKeyEmployeeArray;
+                    try {
+                        selectKeyEmployeeArray = addDataEmployeeInList().toArray(new String[0]);;
+                        selectKeyEmployeeShiftComboBox = new JComboBox<>(selectKeyEmployeeArray);
+                        selectKeyEmployeeShiftComboBox.setBounds(1210, 130,230,35);
+                        selectKeyEmployeeShiftComboBox.setFont(new Font("Arial", Font.PLAIN, 18));
+                        selectKeyEmployeeShiftComboBox.setForeground(Color.black);
+                        selectKeyEmployeeShiftComboBox.setBackground(Color.decode("#24743F"));
+                        selectKeyEmployeeShiftComboBox.setRenderer(new DefaultListCellRenderer() {
+                            @Override
+                            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                                JComponent c = (JComponent) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                                c.setOpaque(true);
+                                c.setFont(new Font("Arial", Font.PLAIN, 18));
+                                c.setBorder(BorderFactory.createEmptyBorder(5,10,5,0));
+                                if (isSelected) {
+                                    c.setBackground(Color.decode("#1F9B49")); // Цвет фона
+                                    c.setForeground(Color.black); // Цвет текста
+                                }
+                                else{
+                                    c.setBackground(Color.decode("#24743F"));
+                                    c.setForeground(Color.black);
+                                }
+                                if (index == -1 && "".equals(value)) {
+                                    setText("Select key employee");
+                                }
+                                return this;
+                            }
+                        });
+                        selectKeyEmployeeShiftComboBox.setSelectedIndex(0);
+                    }
+                    catch (Exception ex) {
+                        System.out.println("Error99: " + ex);
+                        if(ex instanceof ArrayIndexOutOfBoundsException){
+                            textError.setText("Please write data in commission");
+                        }
+                    }
+                    //send
+                    send = new JButton("Send");
+                    send.setFont(new Font("Arial", Font.PLAIN, 18));
+                    send.setForeground(Color.decode("#CADACF")); //color text
+                    send.setBackground(Color.decode("#284F00"));  //color background
+                    send.setBorder(BorderFactory.createLineBorder(Color.decode("#284F00"), 2));
+                    send.setFocusPainted(false);
+                    send.setBounds(180, 130,230,35);
+                    send.addMouseListener(new MouseAdapter() {
+                        public void mousePressed(MouseEvent me) {
+                            send.setForeground(Color.decode("#CADACF")); // меняем цвет текста на черный при нажатии
+                            send.setBackground(Color.decode("#1F9B49"));  //color background
+                        }
+                    });
+
+                    panel.add(start_calendar_shift);
+                    panel.add(start_time_shift);
+                    panel.add(end_calendar_shift);
+                    panel.add(end_time_shift);
+                    panel.add(price_hour_shift);
+                    panel.add(selectKeyEmployeeShiftComboBox);
+                    panel.add(textError);
+                    panel.add(send);
+                    send.addActionListener(new eventSendDataBase());
                 }
                 else if ("Сума в касі".equals(selectedText)) {
                     deleteComponents();
                     System.out.println("Сума в касі");
+                    //start_price_cash_register
+                    start_price_cash_register  = new JTextField("Enter start price cash register");
+                    start_price_cash_register.setBounds(420, 80,260,35);
+                    start_price_cash_register.setFont(new Font("Arial", Font.PLAIN, 18));
+                    start_price_cash_register.setForeground(Color.black);
+                    start_price_cash_register.setBackground(Color.decode("#24743F"));
+                    start_price_cash_register.setBorder(BorderFactory.createEmptyBorder(5,5,5,0));
+                    start_price_cash_register.addFocusListener(new FocusAdapter() {
+                        @Override
+                        public void focusGained(FocusEvent e) {
+                            if (start_price_cash_register.getText().equals("Enter start price cash register")) {
+                                start_price_cash_register.setText("");
+                            }
+                        }
+                        @Override
+                        public void focusLost(FocusEvent e) {
+                            if (start_price_cash_register.getText().isEmpty()) {
+                                start_price_cash_register.setText("Enter start price cash register");
+                            }
+                        }
+                    });
+                    //end_price_cash_register
+                    end_price_cash_register  = new JTextField("Enter end price cash register");
+                    end_price_cash_register.setBounds(420, 130,260,35);
+                    end_price_cash_register.setFont(new Font("Arial", Font.PLAIN, 18));
+                    end_price_cash_register.setForeground(Color.black);
+                    end_price_cash_register.setBackground(Color.decode("#24743F"));
+                    end_price_cash_register.setBorder(BorderFactory.createEmptyBorder(5,5,5,0));
+                    end_price_cash_register.addFocusListener(new FocusAdapter() {
+                        @Override
+                        public void focusGained(FocusEvent e) {
+                            if (end_price_cash_register.getText().equals("Enter end price cash register")) {
+                                end_price_cash_register.setText("");
+                            }
+                        }
+                        @Override
+                        public void focusLost(FocusEvent e) {
+                            if (end_price_cash_register.getText().isEmpty()) {
+                                end_price_cash_register.setText("Enter end price cash register");
+                            }
+                        }
+                    });
+                    //textError
+                    textError = new JLabel("");
+                    textError.setFont(new Font("Arial", Font.PLAIN, 18));
+                    textError.setForeground(Color.decode("#000000"));
+                    textError.setBounds(180, 170,290,50);
+
+                    //selectKeyCurrencyArray
+                    String[] selectKeyCurrencyArray;
+                    try {
+                        selectKeyCurrencyArray = addDataCurrencyInList().toArray(new String[0]);;
+                        selectKeyCurrencyCashRegisterComboBox = new JComboBox<>(selectKeyCurrencyArray);
+                        selectKeyCurrencyCashRegisterComboBox.setBounds(690, 80,230,35);
+                        selectKeyCurrencyCashRegisterComboBox.setFont(new Font("Arial", Font.PLAIN, 18));
+                        selectKeyCurrencyCashRegisterComboBox.setForeground(Color.black);
+                        selectKeyCurrencyCashRegisterComboBox.setBackground(Color.decode("#24743F"));
+                        selectKeyCurrencyCashRegisterComboBox.setRenderer(new DefaultListCellRenderer() {
+                            @Override
+                            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                                JComponent c = (JComponent) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                                c.setOpaque(true);
+                                c.setFont(new Font("Arial", Font.PLAIN, 18));
+                                c.setBorder(BorderFactory.createEmptyBorder(5,10,5,0));
+                                if (isSelected) {
+                                    c.setBackground(Color.decode("#1F9B49")); // Цвет фона
+                                    c.setForeground(Color.black); // Цвет текста
+                                }
+                                else{
+                                    c.setBackground(Color.decode("#24743F"));
+                                    c.setForeground(Color.black);
+                                }
+                                if (index == -1 && "".equals(value)) {
+                                    setText("Select name currency");
+                                }
+                                return this;
+                            }
+                        });
+                        selectKeyCurrencyCashRegisterComboBox.setSelectedIndex(0);
+                    }
+                    catch (Exception ex) {
+                        System.out.println("Error98: " + ex);
+                        if(ex instanceof ArrayIndexOutOfBoundsException){
+                            textError.setText("Please write data in currency");
+                        }
+                    }
+                    //selectKeyShiftArray
+                    String[] selectKeyShiftArray;
+                    try {
+                        selectKeyShiftArray = addDataShiftInList().toArray(new String[0]);;
+                        selectKeyShiftCashRegisterComboBox = new JComboBox<>(selectKeyShiftArray);
+                        selectKeyShiftCashRegisterComboBox.setBounds(930, 80,230,35);
+                        selectKeyShiftCashRegisterComboBox.setFont(new Font("Arial", Font.PLAIN, 18));
+                        selectKeyShiftCashRegisterComboBox.setForeground(Color.black);
+                        selectKeyShiftCashRegisterComboBox.setBackground(Color.decode("#24743F"));
+                        selectKeyShiftCashRegisterComboBox.setRenderer(new DefaultListCellRenderer() {
+                            @Override
+                            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                                JComponent c = (JComponent) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                                c.setOpaque(true);
+                                c.setFont(new Font("Arial", Font.PLAIN, 18));
+                                c.setBorder(BorderFactory.createEmptyBorder(5,10,5,0));
+                                if (isSelected) {
+                                    c.setBackground(Color.decode("#1F9B49")); // Цвет фона
+                                    c.setForeground(Color.black); // Цвет текста
+                                }
+                                else{
+                                    c.setBackground(Color.decode("#24743F"));
+                                    c.setForeground(Color.black);
+                                }
+                                if (index == -1 && "".equals(value)) {
+                                    setText("Select key shift");
+                                }
+                                return this;
+                            }
+                        });
+                        selectKeyShiftCashRegisterComboBox.setSelectedIndex(0);
+                    }
+                    catch (Exception ex) {
+                        System.out.println("Error97: " + ex);
+                        if(ex instanceof ArrayIndexOutOfBoundsException){
+                            textError.setText("Please write data in shift");
+                        }
+                    }
+                    //send
+                    send = new JButton("Send");
+                    send.setFont(new Font("Arial", Font.PLAIN, 18));
+                    send.setForeground(Color.decode("#CADACF")); //color text
+                    send.setBackground(Color.decode("#284F00"));  //color background
+                    send.setBorder(BorderFactory.createLineBorder(Color.decode("#284F00"), 2));
+                    send.setFocusPainted(false);
+                    send.setBounds(180, 130,230,35);
+                    send.addMouseListener(new MouseAdapter() {
+                        public void mousePressed(MouseEvent me) {
+                            send.setForeground(Color.decode("#CADACF")); // меняем цвет текста на черный при нажатии
+                            send.setBackground(Color.decode("#1F9B49"));  //color background
+                        }
+                    });
+
+                    panel.add(start_price_cash_register);
+                    panel.add(end_price_cash_register);
+                    panel.add(selectKeyCurrencyCashRegisterComboBox);
+                    panel.add(selectKeyShiftCashRegisterComboBox);
+                    panel.add(textError);
+                    panel.add(send);
+                    send.addActionListener(new eventSendDataBase());
                 }
                 else if ("Присутність".equals(selectedText)) {
                     deleteComponents();
                     System.out.println("Присутність");
+                    //start_actual_calendar
+                    start_actual_calendar = new JCalendar();
+                    start_actual_calendar.setBounds(420, 80,260,210);
+                    start_actual_calendar.setFont(new Font("Arial", Font.PLAIN, 18));
+                    start_actual_calendar.setForeground(Color.black);
+                    start_actual_calendar.setBackground(Color.decode("#24743F"));
+                    start_actual_calendar.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+                    //start_actual_time
+                    Date initialDate = new Date();
+                    SpinnerDateModel spinnerModel = new SpinnerDateModel(initialDate, null, null, Calendar.HOUR_OF_DAY);
+                    startTimeShift  = new JSpinner(spinnerModel);
+                    textField = new JSpinner.DateEditor(startTimeShift , "HH:mm:ss");
+                    startTimeShift.setEditor(textField);
+                    start_actual_time = ((JSpinner.DefaultEditor) startTimeShift.getEditor()).getTextField();
+                    start_actual_time.setBounds(690, 80,110,40);
+                    start_actual_time.setFont(new Font("Arial", Font.PLAIN, 18));
+                    start_actual_time.setForeground(Color.black);
+                    start_actual_time.setBackground(Color.decode("#24743F"));
+                    start_actual_time.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+                    //end_actual_calendar
+                    end_actual_calendar = new JCalendar();
+                    end_actual_calendar.setBounds(420, 80,260,210);
+                    end_actual_calendar.setFont(new Font("Arial", Font.PLAIN, 18));
+                    end_actual_calendar.setForeground(Color.black);
+                    end_actual_calendar.setBackground(Color.decode("#24743F"));
+                    end_actual_calendar.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+                    //end_actual_time
+                    end_actual_time = ((JSpinner.DefaultEditor) startTimeShift.getEditor()).getTextField();
+                    end_actual_time.setBounds(690, 80,110,40);
+                    end_actual_time.setFont(new Font("Arial", Font.PLAIN, 18));
+                    end_actual_time.setForeground(Color.black);
+                    end_actual_time.setBackground(Color.decode("#24743F"));
+                    end_actual_time.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+                    //presence_time
+                    presence_time = ((JSpinner.DefaultEditor) startTimeShift.getEditor()).getTextField();
+                    presence_time.setBounds(690, 80,110,40);
+                    presence_time.setFont(new Font("Arial", Font.PLAIN, 18));
+                    presence_time.setForeground(Color.black);
+                    presence_time.setBackground(Color.decode("#24743F"));
+                    presence_time.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+                    //textError
+                    textError = new JLabel("");
+                    textError.setFont(new Font("Arial", Font.PLAIN, 18));
+                    textError.setForeground(Color.decode("#000000"));
+                    textError.setBounds(180, 170,290,50);
+
+                    //selectKeyShiftArray
+                    String[] selectKeyShiftArray;
+                    try {
+                        selectKeyShiftArray = addDataShiftInList().toArray(new String[0]);;
+                        selectKeyShiftCashRegisterComboBox = new JComboBox<>(selectKeyShiftArray);
+                        selectKeyShiftCashRegisterComboBox.setBounds(930, 80,230,35);
+                        selectKeyShiftCashRegisterComboBox.setFont(new Font("Arial", Font.PLAIN, 18));
+                        selectKeyShiftCashRegisterComboBox.setForeground(Color.black);
+                        selectKeyShiftCashRegisterComboBox.setBackground(Color.decode("#24743F"));
+                        selectKeyShiftCashRegisterComboBox.setRenderer(new DefaultListCellRenderer() {
+                            @Override
+                            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                                JComponent c = (JComponent) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                                c.setOpaque(true);
+                                c.setFont(new Font("Arial", Font.PLAIN, 18));
+                                c.setBorder(BorderFactory.createEmptyBorder(5,10,5,0));
+                                if (isSelected) {
+                                    c.setBackground(Color.decode("#1F9B49")); // Цвет фона
+                                    c.setForeground(Color.black); // Цвет текста
+                                }
+                                else{
+                                    c.setBackground(Color.decode("#24743F"));
+                                    c.setForeground(Color.black);
+                                }
+                                if (index == -1 && "".equals(value)) {
+                                    setText("Select key shift");
+                                }
+                                return this;
+                            }
+                        });
+                        selectKeyShiftCashRegisterComboBox.setSelectedIndex(0);
+                    }
+                    catch (Exception ex) {
+                        System.out.println("Error97: " + ex);
+                        if(ex instanceof ArrayIndexOutOfBoundsException){
+                            textError.setText("Please write data in shift");
+                        }
+                    }
+                    //selectIdEmployee
+                    String[] selectKeyEmployeeArray;
+                    try {
+                        selectKeyEmployeeArray = addDataEmployeeInList().toArray(new String[0]);;
+                        selectKeyEmployeeShiftComboBox = new JComboBox<>(selectKeyEmployeeArray);
+                        selectKeyEmployeeShiftComboBox.setBounds(1210, 130,230,35);
+                        selectKeyEmployeeShiftComboBox.setFont(new Font("Arial", Font.PLAIN, 18));
+                        selectKeyEmployeeShiftComboBox.setForeground(Color.black);
+                        selectKeyEmployeeShiftComboBox.setBackground(Color.decode("#24743F"));
+                        selectKeyEmployeeShiftComboBox.setRenderer(new DefaultListCellRenderer() {
+                            @Override
+                            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                                JComponent c = (JComponent) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                                c.setOpaque(true);
+                                c.setFont(new Font("Arial", Font.PLAIN, 18));
+                                c.setBorder(BorderFactory.createEmptyBorder(5,10,5,0));
+                                if (isSelected) {
+                                    c.setBackground(Color.decode("#1F9B49")); // Цвет фона
+                                    c.setForeground(Color.black); // Цвет текста
+                                }
+                                else{
+                                    c.setBackground(Color.decode("#24743F"));
+                                    c.setForeground(Color.black);
+                                }
+                                if (index == -1 && "".equals(value)) {
+                                    setText("Select key employee");
+                                }
+                                return this;
+                            }
+                        });
+                        selectKeyEmployeeShiftComboBox.setSelectedIndex(0);
+                    }
+                    catch (Exception ex) {
+                        System.out.println("Error99: " + ex);
+                        if(ex instanceof ArrayIndexOutOfBoundsException){
+                            textError.setText("Please write data in commission");
+                        }
+                    }
+
+                    //send
+                    send = new JButton("Send");
+                    send.setFont(new Font("Arial", Font.PLAIN, 18));
+                    send.setForeground(Color.decode("#CADACF")); //color text
+                    send.setBackground(Color.decode("#284F00"));  //color background
+                    send.setBorder(BorderFactory.createLineBorder(Color.decode("#284F00"), 2));
+                    send.setFocusPainted(false);
+                    send.setBounds(180, 130,230,35);
+                    send.addMouseListener(new MouseAdapter() {
+                        public void mousePressed(MouseEvent me) {
+                            send.setForeground(Color.decode("#CADACF")); // меняем цвет текста на черный при нажатии
+                            send.setBackground(Color.decode("#1F9B49"));  //color background
+                        }
+                    });
+
+                    panel.add(start_actual_calendar);
+                    panel.add(start_actual_time);
+                    //panel.add(end_actual_calendar);
+                    //panel.add(end_actual_time);
+                    //panel.add(presence_time);
+                    //panel.add(selectKeyShiftCashRegisterComboBox);
+                    //panel.add(selectKeyEmployeeShiftComboBox);
+                    panel.add(textError);
+                    panel.add(send);
+                    send.addActionListener(new eventSendDataBase());
                 }
                 else if ("Валюта та курс обміну".equals(selectedText)) {
                     deleteComponents();
@@ -596,7 +1130,6 @@ public class adminInterface extends JFrame implements ActionListener{
                 panel.repaint(); // Mетод запрашивает перерисовку компонента и его дочерних элементов
             }
         });
-
         //event
         addData.addMouseListener(new MouseAdapter() {
             @Override
@@ -641,14 +1174,9 @@ public class adminInterface extends JFrame implements ActionListener{
                 }
                 else if("Валюти".equals(selectedItem)){
                     System.out.println("Валюти eventSendDataBase");
-
                     String nameCurrency = name_currency.getText().trim();
                     String desCurrency = description_currency.getText().trim();
                     String strAvailCurrency = availability_currency.getText().trim();
-
-                    //System.out.println("nameCurrency: " + nameCurrency); //delete
-                    //System.out.println("desCurrency: " + desCurrency); //delete
-                    //System.out.println("availCurrency: " + strAvailCurrency); //delete
 
                     if(nameCurrency.equals("Enter name currency") || desCurrency.equals("Enter description")){
                         textError.setText("Please write data");
@@ -666,7 +1194,6 @@ public class adminInterface extends JFrame implements ActionListener{
                 }
                 else if("Послуга".equals(selectedItem)){
                     System.out.println("Послуга eventSendDataBase");
-
                     String nameService = name_service.getText().trim();
                     String desService = description_service.getText().trim();
                     String strSellPriceService = sell_price_service.getText().trim();
@@ -674,17 +1201,14 @@ public class adminInterface extends JFrame implements ActionListener{
                     String keyCommission = (String) selectKeyCommissionComboBox.getSelectedItem();
 
                     if(nameService.equals("Enter name service") || desService.equals("Enter description")){
-                        textError.setText("");
                         textError.setText("Please write data");
                         System.out.println("nameService {111}"); //delete
                     }
                     else if(strSellPriceService.equals("Enter sell price") || strPurchasedPriceService.equals("Enter purchased price")){
-                        textError.setText("");
                         textError.setText("Please write number");
                         System.out.println("nameService {222}"); //delete
                     }
                     else if(keyCommission.equals("Select key commission")){
-                        textError.setText("");
                         textError.setText("Please select key commission");
                         System.out.println("nameService {333}"); //delete
                     }
@@ -695,12 +1219,94 @@ public class adminInterface extends JFrame implements ActionListener{
                         addDataInDataBase(selectedItem, nameService, desService, sellPriceService,purchasedPriceService, keyCommission);
                     }
                 }
-                else if("Курс обміну".equals(selectedItem)){}
-                else if("Тариф".equals(selectedItem)){}
-                else if("Рахунок".equals(selectedItem)){}
-                else if("Зміна".equals(selectedItem)){}
-                else if("Сума в касі".equals(selectedItem)){}
-                else if("Присутність".equals(selectedItem)){}
+                else if("Курс обміну".equals(selectedItem)){
+                    System.out.println("Курс обміну eventSendDataBase");
+                    //year-month-day
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                    String calendarExchangerRate = dateFormat.format(calendar_exchanger_rate.getDate());
+                    //hour-minutes-seconds
+                    String timeExchangerRate = time_exchanger_rate.getText();
+                    addDataInDataBase(selectedItem, calendarExchangerRate, timeExchangerRate);
+                }
+                else if("Тариф".equals(selectedItem)){
+                    System.out.println("Тариф eventSendDataBase");
+                    String nameCommission = name_commission.getText().trim();
+                    String priceCommission = price_commission.getText().trim();
+
+                    if(nameCommission.equals("Enter name commission")){
+                        textError.setText("Please write data");
+                    }
+                    else if(priceCommission.equals("Enter price commission")){
+                        textError.setText("Please write number");
+                    }
+                    else {
+                        int availCommission = Integer.parseInt(priceCommission);
+                        addDataInDataBase(selectedItem, nameCommission, availCommission);
+                    }
+                }
+                else if("Зміна".equals(selectedItem)){
+                    System.out.println("Зміна eventSendDataBase");
+                    String priceHourShift = price_hour_shift.getText().trim();
+                    //start_shift
+                    SimpleDateFormat startDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                    String calendarStartShift = startDateFormat.format(start_calendar_shift.getDate());
+                    //start_shift
+                    String timeStartShift = start_time_shift.getText();
+                    //end_shift
+                    SimpleDateFormat endDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                    String calendarEndShift = endDateFormat.format(end_calendar_shift.getDate());
+                    //end_shift
+                    String timeEndShift = end_time_shift.getText();
+                    String keyEmployeeShift = (String) selectKeyCommissionComboBox.getSelectedItem();
+
+
+                    if(priceHourShift.equals("Enter price commission")){
+                        textError.setText("Please write number");
+                    }
+                    else {
+                        int availShift = Integer.parseInt(priceHourShift);
+                        addDataInDataBase(selectedItem, calendarStartShift, timeStartShift, calendarEndShift, timeEndShift, availShift, keyEmployeeShift);
+                    }
+                }
+                else if("Сума в касі".equals(selectedItem)){
+                    System.out.println("Сума в касі eventSendDataBase");
+                    String startPriceCashRegister = start_price_cash_register.getText().trim();
+                    String endPriceCashRegister = end_price_cash_register.getText().trim();
+                    //comboBoX
+                    String nameCurrency = (String) selectKeyCurrencyCashRegisterComboBox.getSelectedItem();
+                    String keyShift = (String) selectKeyShiftCashRegisterComboBox.getSelectedItem();
+
+                    if(startPriceCashRegister.equals("Enter start price cash register") || endPriceCashRegister.equals("Enter end price cash register")){
+                        textError.setText("Please write number");
+                    }
+                    else if(nameCurrency.equals("Select name currency") || keyShift.equals("Select key shift")){
+                        textError.setText("Please chose data in shift or currency");
+                    }
+                    else {
+                        int availStartPrice = Integer.parseInt(startPriceCashRegister);
+                        int availEndPrice = Integer.parseInt(endPriceCashRegister);
+                        addDataInDataBase(selectedItem, availStartPrice, availEndPrice, nameCurrency, keyShift);
+                    }
+                }
+                else if("Присутність".equals(selectedItem)){
+                    System.out.println("Присутність eventSendDataBase");
+                    //start_actual_calendar
+                    SimpleDateFormat startDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                    String startActualCalendar = startDateFormat.format(start_actual_calendar.getDate());
+                    String startActualTime = start_actual_time.getText();
+                    String allStart = startActualCalendar + " " + startActualTime;
+                    //end_actual_calendar
+                    SimpleDateFormat endDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                    String endActualCalendar = endDateFormat.format(end_actual_calendar.getDate());
+                    String endActualTime = end_actual_time.getText();
+                    String allEnd = endActualCalendar + " " + endActualTime;
+                    //presence_time
+                    String presenceTime = presence_time.getText();
+                    //JComboBox
+                    String keyEmployee = (String) selectKeyEmployeeShiftComboBox.getSelectedItem();
+                    String keyShift = (String) selectKeyShiftCashRegisterComboBox.getSelectedItem();
+                    addDataInDataBase(selectedItem, allStart, allEnd, presenceTime, keyEmployee, keyShift);
+                }
                 else if("Валюта та курс обміну".equals(selectedItem)){}
                 else if("Валюти та послуги".equals(selectedItem)){}
             }
@@ -730,6 +1336,62 @@ public class adminInterface extends JFrame implements ActionListener{
                 //service
                 else if (box.equals(selectKeyCommissionComboBox)) {
                     panel.remove(box);
+                }
+                //employee
+                else if (box.equals(selectKeyEmployeeShiftComboBox)) {
+                    panel.remove(box);
+                }
+                //cash register
+                else if (box.equals(selectKeyCurrencyCashRegisterComboBox)) {
+                    panel.remove(box);
+                }
+                else if (box.equals(selectKeyShiftCashRegisterComboBox)) {
+                    panel.remove(box);
+                }
+            }
+            else if (component instanceof JCalendar) {
+                JCalendar jCalendar = (JCalendar) component;
+                //exchanger_rate
+                if (jCalendar.equals(calendar_exchanger_rate)) {
+                    panel.remove(jCalendar);
+                }
+                //shift
+                else if (jCalendar.equals(start_calendar_shift)) {
+                    panel.remove(jCalendar);
+                }
+                else if (jCalendar.equals(end_calendar_shift)) {
+                    panel.remove(jCalendar);
+                }
+                //presence
+                else if (jCalendar.equals(start_actual_calendar)) {
+                    panel.remove(jCalendar);
+                }
+                else if (jCalendar.equals(end_actual_calendar)) {
+                    panel.remove(jCalendar);
+                }
+            }
+            else if (component instanceof JFormattedTextField) {
+                JFormattedTextField jFormattedTextField = (JFormattedTextField) component;
+                //exchanger_rate
+                if (jFormattedTextField.equals(time_exchanger_rate)) {
+                    panel.remove(jFormattedTextField);
+                }
+                //shift
+                else if (jFormattedTextField.equals(start_time_shift)) {
+                    panel.remove(jFormattedTextField);
+                }
+                else if (jFormattedTextField.equals(end_time_shift)) {
+                    panel.remove(jFormattedTextField);
+                }
+                //presence
+                else if (jFormattedTextField.equals(start_actual_time)) {
+                    panel.remove(jFormattedTextField);
+                }
+                else if (jFormattedTextField.equals(end_actual_time)) {
+                    panel.remove(jFormattedTextField);
+                }
+                else if (jFormattedTextField.equals(presence_time)) {
+                    panel.remove(jFormattedTextField);
                 }
             }
             else if (component instanceof JLabel) {
@@ -778,11 +1440,30 @@ public class adminInterface extends JFrame implements ActionListener{
                 else if (textField.equals(purchased_price_service)) {
                     panel.remove(textField);
                 }
+                //commission
+                else if (textField.equals(name_commission)) {
+                    panel.remove(textField);
+                }
+                else if (textField.equals(price_commission)) {
+                    panel.remove(textField);
+                }
+                //shift
+                else if (textField.equals(price_hour_shift)) {
+                    panel.remove(textField);
+                }
+                //cash register
+                else if (textField.equals(start_price_cash_register)) {
+                    panel.remove(textField);
+                }
+                else if (textField.equals(end_price_cash_register)) {
+                    panel.remove(textField);
+                }
             }
         }
         panel.revalidate();
         panel.repaint();
     }
+    //commission
     private ArrayList<String> addDataInList() throws SQLException{
         ArrayList<String> selectIdCommission = new ArrayList<>();
         try {
@@ -793,19 +1474,94 @@ public class adminInterface extends JFrame implements ActionListener{
             while (resulIdCommission.next()) {
                 selectIdCommission.add(resulIdCommission.getString("id_commission"));
             }
+            if(selectIdCommission.isEmpty()){
+                selectIdCommission.add(0, "");
+                textError.setText("Please write data in commission");
+            }
         }
         catch(Exception ex){
-            System.out.println("Error addDataInList: " + ex);
+            System.out.println("Error addDataCommissionInList: " + ex);
             if(ex instanceof NullPointerException){
-                selectIdCommission.add("");
+                selectIdCommission.add(0, "");
             }
         }
         return selectIdCommission;
     }
+    //employee
+    private ArrayList<String> addDataEmployeeInList() throws SQLException{
+        ArrayList<String> selectIdEmployee = new ArrayList<>();
+        try {
+            String getIdEmployee = "SELECT id_employee FROM employee;";
+            Statement statement = conn.createStatement();
+            ResultSet resulIdEmployee = statement.executeQuery(getIdEmployee);
+            while (resulIdEmployee.next()) {
+                selectIdEmployee.add(resulIdEmployee.getString("id_commission"));
+            }
+            if(selectIdEmployee.isEmpty()){
+                selectIdEmployee.add(0, "");
+                textError.setText("Please write data in employee");
+            }
+        }
+        catch(Exception ex){
+            System.out.println("Error addDataEmployeeInList: " + ex);
+            if(ex instanceof NullPointerException){
+                selectIdEmployee.add(0, "");
+            }
+        }
+        return selectIdEmployee;
+    }
+    //currency
+    private ArrayList<String> addDataCurrencyInList() throws SQLException{
+        ArrayList<String> selectNameCurrency = new ArrayList<>();
+        try {
+            String getNameCurrency = "SELECT name_currency FROM currency;";
+            Statement statement = conn.createStatement();
+            System.out.println("resultNameCurrency: " + statement.executeQuery(getNameCurrency)); //delete
+            ResultSet resultNameCurrency = statement.executeQuery(getNameCurrency);
+            while (resultNameCurrency.next()) {
+                selectNameCurrency.add(resultNameCurrency.getString("name_currency"));
+            }
+            if(selectNameCurrency.isEmpty()){
+                selectNameCurrency.add(0, "");
+                textError.setText("Please write data in currency");
+            }
+        }
+        catch(Exception ex){
+            System.out.println("Error addDataCurrencyInList: " + ex);
+            if(ex instanceof NullPointerException){
+                selectNameCurrency.add(0, "");
+            }
+        }
+        return selectNameCurrency;
+    }
+    //shift
+    private ArrayList<String> addDataShiftInList() throws SQLException{
+        ArrayList<String> selectIdShift = new ArrayList<>();
+        try {
+            String getIdCommission = "SELECT id_shift FROM shift;";
+            Statement statement = conn.createStatement();
+            System.out.println("resulIdCommission: " + statement.executeQuery(getIdCommission));
+            ResultSet resulIdCommission = statement.executeQuery(getIdCommission);
+            while (resulIdCommission.next()) {
+                selectIdShift.add(resulIdCommission.getString("id_shift"));
+            }
+            if(selectIdShift.isEmpty()){
+                selectIdShift.add(0, "");
+                textError.setText("Please write data in shift");
+            }
+        }
+        catch(Exception ex) {
+            System.out.println("Error addDataShiftInList: " + ex);
+            if(ex instanceof NullPointerException){
+                selectIdShift.add(0, "");
+            }
+        }
+        return selectIdShift;
+    }
     public void addDataInDataBase(Object... dataForDataBase){
         try {
             Object stringPoint = dataForDataBase[0];
-            String addCurrencyDataBase, sqlAddData;
+            String addCurrencyDataBase, sqlAddData, addAllTimeDataBase;
             if ("Працівник".equals(stringPoint))  {
                 Object name = dataForDataBase[1];
                 Object telephone = dataForDataBase[2];
@@ -853,7 +1609,6 @@ public class adminInterface extends JFrame implements ActionListener{
                         statement.executeUpdate(addRole);
                         statement.executeUpdate(addRoleRightsCashier);
                         System.out.println("Працівник 111111{11111}"); //delete
-                        textError.setText("");
                         textError.setText("Add data in Data Base");
                     }
                     else if("admin".equals(role) && !"Enter name employee".equals(name) && !"Telephone (+777-77-77)".equals(telephone) && !"Enter login".equals(login) && !"Enter password".equals(password)) {
@@ -861,33 +1616,26 @@ public class adminInterface extends JFrame implements ActionListener{
                         statement.executeUpdate(addRole);
                         statement.executeUpdate(addRoleRightsAdmin);
                         System.out.println("Працівник 111111{22222}"); //delete
-                        textError.setText("");
                         textError.setText("Add data in Data Base");
                     }
                     else{
-                        textError.setText("");
                         textError.setText("Not add data in Data Base");
                     }
                 }
                 else{
                     if(!resultName.next()){
-                        textError.setText("");
                         textError.setText("This name where in Database");
                     }
                     else if(!resultLogin.next()){
-                        textError.setText("");
                         textError.setText("This login where in Database");
                     }
                     else if(!resultPassword.next()){
-                        textError.setText("");
                         textError.setText("This password where in Database");
                     }
                     else if(!resultTelephone.next()){
-                        textError.setText("");
                         textError.setText("This name telephone in Database");
                     }
                     else{
-                        textError.setText("");
                         textError.setText("This data in Database");
                     }
                 }
@@ -897,7 +1645,6 @@ public class adminInterface extends JFrame implements ActionListener{
                 statement3.close();
             }
             else if("Валюти".equals(stringPoint)){
-                System.out.println("Валюта 111111{11111}"); //delete
                 Object nameCurrency = dataForDataBase[1];
                 Object desCurrency = dataForDataBase[2];
                 Object availCurrency = dataForDataBase[3];
@@ -937,7 +1684,6 @@ public class adminInterface extends JFrame implements ActionListener{
                 statement1.close();
             }
             else if("Послуга".equals(stringPoint)){
-                System.out.println("Послуга 111111{11111}"); //delete
                 Object nameService = dataForDataBase[1];
                 Object desService = dataForDataBase[2];
                 Object sellAvailCurrency = dataForDataBase[3];
@@ -959,45 +1705,158 @@ public class adminInterface extends JFrame implements ActionListener{
                 if (!resultName.next() && !resultDescription.next()) {
                     if(!"Enter name service".equals(nameService) && !"Enter sell price".equals(sellAvailCurrency) && !"Enter purchased price".equals(purchasedAvailCurrency) && !"Select key commission".equals(keyCommission)) {
                         statement.executeUpdate(addCurrencyDataBase);
-                        textError.setText("");
                         textError.setText("Add data in Data Base");
                         System.out.println("Послуга 111111{22222}"); //delete
                     }
                     else{
-                        textError.setText("");
                         textError.setText("Not add data in Data Base");
                     }
                 }
                 else{
                     if(!resultName.next()){
-                        textError.setText("");
                         textError.setText("This name where in Database");
                     }
                     else if(!resultDescription.next()){
-                        textError.setText("");
                         textError.setText("This description where in Database");
                     }
                     else{
-                        textError.setText("");
                         textError.setText("This data in Database");
                     }
                 }
                 statement.close();
                 statement1.close();
-
             }
-            else if("Курс обміну".equals(stringPoint)){}
-            else if("Тариф".equals(stringPoint)){}
-            else if("Рахунок".equals(stringPoint)){}
-            else if("Зміна".equals(stringPoint)){}
-            else if("Сума в касі".equals(stringPoint)){}
-            else if("Присутність".equals(stringPoint)){}
+            else if("Курс обміну".equals(stringPoint)){
+                Object calendarExchangerRate = dataForDataBase[1];
+                Object timeExchangerRate = dataForDataBase[2];
+                Object allTime = calendarExchangerRate + " " + timeExchangerRate;
+                //insert
+                addAllTimeDataBase = "INSERT INTO exchanger_rate(time_exchanger_rate) VALUES (\'" +  allTime + "\');";
+                //check data
+                String checkAllTime = "SELECT time_exchanger_rate FROM exchanger_rate WHERE time_exchanger_rate = \'" + allTime + "\';";
+                //statement
+                Statement statement = conn.createStatement();
+                ResultSet resultAllTime = statement.executeQuery(checkAllTime);
+
+                if (!resultAllTime.next()) {
+                    statement.executeUpdate(addAllTimeDataBase);
+                    textError.setText("Add data in Data Base");
+                    System.out.println("Курс обміну 111111{22222}"); //delete
+                }
+                else if(!resultAllTime.next()){
+                    textError.setText("This time where in Database");
+                }
+                statement.close();
+            }
+            else if("Тариф".equals(stringPoint)){
+                System.out.println("Тариф 111111{11111}"); //delete
+                Object nameСommission = dataForDataBase[1];
+                Object priceСommission = dataForDataBase[2];
+
+                addCurrencyDataBase = "INSERT INTO commission(name_commission, price_commission) VALUES (\'" + nameСommission +  "\', " + priceСommission + ");";
+                //check data
+                String checkNameCommission = "SELECT name_commission FROM commission WHERE name_commission = \'" + nameСommission + "\';";
+                //statement
+                Statement statement = conn.createStatement();
+                ResultSet resultName = statement.executeQuery(checkNameCommission);
+
+                if (!resultName.next()) {
+                    if(!"Enter name commission".equals(nameСommission) && !"Enter price commission".equals(priceСommission)) {
+                        statement.executeUpdate(addCurrencyDataBase);
+                        textError.setText("Add data in Data Base");
+                    }
+                    else{
+                        textError.setText("Not add data in Data Base");
+                    }
+                }
+                else{
+                    if(!resultName.next()){
+                        textError.setText("This name where in Database");
+                    }
+                    else{
+                        textError.setText("This data in Database");
+                    }
+                }
+                statement.close();
+            }
+            else if("Зміна".equals(stringPoint)){
+                System.out.println("Зміна 111111{11111}"); //delete
+                Object calendarStartShift = dataForDataBase[1];
+                Object timeStartShift = dataForDataBase[2];
+                Object allTimeStart = calendarStartShift + " " + timeStartShift;
+                //end
+                Object calendarEndShift = dataForDataBase[3];
+                Object timeEndShift = dataForDataBase[4];
+                Object allTimeEnd = calendarEndShift + " " + timeEndShift;
+                //priceHourShift
+                Object priceHourShift = dataForDataBase[5];
+                Object keyCommission = dataForDataBase[6];
+                //insert
+                sqlAddData = "INSERT INTO shift(id_employee, start_time_shift, end_time_shift, price_shift) VALUES (" +
+                        keyCommission + ", \'" + allTimeStart + "\', \'" + allTimeEnd + "\'," + priceHourShift + ");";
+                //check data
+                String checkAllTimeStart = "SELECT start_time_shift FROM shift WHERE start_time_shift = \'" + allTimeStart + "\';";
+                String checkAllTimeEnd = "SELECT end_time_shift FROM shift WHERE end_time_shift = \'" + allTimeEnd + "\';";
+                //statement
+                Statement statement = conn.createStatement();
+                ResultSet resultAllTimeStart = statement.executeQuery(checkAllTimeStart);
+                Statement statement1 = conn.createStatement();
+                ResultSet resultAllTimeEnd = statement.executeQuery(checkAllTimeEnd);
+                if(!"Enter hour price shift".equals(priceHourShift)) {
+                    statement.executeUpdate(sqlAddData);
+                    textError.setText("Add data in Data Base");
+                }
+                else{
+                    if(!resultAllTimeStart.next() || !resultAllTimeEnd.next()){
+                        textError.setText("This name where in Database");
+                    }
+                    else{
+                        textError.setText("This data in Database");
+                    }
+                }
+                statement.close();
+                statement1.close();
+            }
+            else if("Сума в касі".equals(stringPoint)){
+                System.out.println("Сума в касі 111111{11111}"); //delete
+                Object availStartPrice = dataForDataBase[1];
+                Object availEndPrice = dataForDataBase[2];
+                Object nameCurrency = dataForDataBase[3];
+                Object keyShift = dataForDataBase[4];
+                //insert
+                sqlAddData = "DO $$ \nDECLARE \n    currencyId INT;\nBEGIN    SELECT id_currency INTO currencyId FROM currency WHERE name_currency = \'" + nameCurrency + "\';\n" +
+                                "RAISE NOTICE \'Currency ID: %\', currencyId;\n INSERT INTO amount_cash_register(id_shift, id_currency, start_amount_cash_register, end_amount_cash_register) " +
+                                "VALUES (" + keyShift + ", currencyId," + availStartPrice + "," + availEndPrice + ");\n END $$;";
+                Statement statement = conn.createStatement();
+                if(!"Enter start price cash register".equals(availStartPrice) || !"Enter end price cash register".equals(availEndPrice)) {
+                    statement.executeUpdate(sqlAddData);
+                    textError.setText("Add data in Data Base");
+                }
+                statement.close();
+            }
+            else if("Присутність".equals(stringPoint)){
+                System.out.println("Присутність 111111{11111}"); //delete
+                Object allStart = dataForDataBase[1];
+                Object allEnd = dataForDataBase[2];
+                Object presenceTime = dataForDataBase[3];
+                Object keyEmployee = dataForDataBase[4];
+                Object keyShift = dataForDataBase[5];
+                //insert
+                sqlAddData = "INSERT INTO presence(id_shift, id_employee, start_presence, end_presence, hours_presence) VALUES (" +
+                        keyShift + ", " + keyEmployee + ", \'" + allStart + "\', \'" + allEnd + "\', \'" + presenceTime + "\');";
+                Statement statement = conn.createStatement();
+
+                if(!"Select key shiftr".equals(selectKeyShiftCashRegisterComboBox) || !"Select key employee".equals(selectKeyEmployeeShiftComboBox)) {
+                    statement.executeUpdate(sqlAddData);
+                    textError.setText("Add data in Data Base");
+                }
+                statement.close();
+            }
             else if("Валюта та курс обміну".equals(stringPoint)){}
             else if("Валюти та послуги".equals(stringPoint)){}
         }
         catch (Exception ex){
             System.out.println("Errror: " + ex);
-            textError.setText("Please write correct data");
             textError.setText("Please write correct data");
         }
     }
