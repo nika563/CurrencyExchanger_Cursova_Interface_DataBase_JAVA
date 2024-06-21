@@ -18,6 +18,9 @@ import java.sql.DriverManager;
 public class singUpInterface extends JFrame {
     JTextField loginInput, passwordInput;
     JLabel textError;
+    public static Connection conn;
+    public static Statement statement;
+    ResultSet resultSet;
     public singUpInterface(){
         super("Exchanger currency");
         super.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); //stop program when exit
@@ -32,8 +35,7 @@ public class singUpInterface extends JFrame {
         JLabel header = new JLabel("Sign up".toUpperCase());
         header.setFont(new Font("Arial",  Font.BOLD, 20));
         header.setForeground(Color.black);
-        header.setBounds(250, 20,100,40);
-
+        header.setBounds(250, 20,100, 50);
         //login
         JLabel loginText = new JLabel("Login:");
         loginText.setFont(new Font("Arial", Font.PLAIN, 18));
@@ -84,12 +86,11 @@ public class singUpInterface extends JFrame {
         public void actionPerformed(ActionEvent e) {
             String login = loginInput.getText();
             String password = passwordInput.getText();
-
             try{
                 workWithFile(login, password);
             }
             catch (Exception ex){
-                System.out.println("Error: " + ex);
+                System.out.println("Error2: " + ex + "\n");
             }
         }
     }
@@ -102,7 +103,7 @@ public class singUpInterface extends JFrame {
         File serviceFile = new File(linkService);
         BufferedReader headerFileReadCache = new BufferedReader(new FileReader(serviceFile));
         BufferedWriter headerFileWriteCache = new BufferedWriter(new FileWriter(serviceFile, true));
-        String searchRole = "SELECT role_employee FROM employee WHERE login_employee = \'" + username + "\';";
+        String checkPermissions = "SELECT role_employee FROM employee WHERE login_employee = \'" + username + "\';";
 
         try {
             String line;
@@ -115,27 +116,27 @@ public class singUpInterface extends JFrame {
                     String user = credentials[0];
                     String pass = credentials[1];
                     if (user.equals(username) && pass.equals(password)) {
-                        Connection conn = DriverManager.getConnection(url, username, password);
+                        conn = DriverManager.getConnection(url, username, password);
                         textError.setText("Connection successful!");
-                        System.out.println("Connection successful! 11111"); //delete
+                        System.out.println("Connection successful!"); //delete
                         openInterface.closeForm();
                         addNewLoginPassword = true;
 
-                        Statement statement = conn.createStatement();
-                        ResultSet resultSet = statement.executeQuery(searchRole);
+                        statement = conn.createStatement();
+                        resultSet = statement.executeQuery(checkPermissions);
                         if (resultSet.next()) {
                             String role = resultSet.getString("role_employee");
-                            System.out.println("role: " + role);
-                            if(role.equals("cashier")) {
-                                cashierInterface cashierFrame = new cashierInterface();
-                                cashierFrame.setVisible(true);
-                            }
-                            else if(role.equals("admin")) {
+                            if ("admin".equals(role)) {
                                 adminInterface adminFrame = new adminInterface();
                                 adminFrame.setVisible(true);
+                                break;
+                            } else if ("cashier".equals(role)) {
+                                cashierInterface cashierFrame = new cashierInterface();
+                                cashierFrame.setVisible(true);
+                                break;
                             }
                         }
-                        break;
+                        statement.close();
                     }
                     else if (!user.equals(username) && pass.equals(password)) {
                         textError.setText("Not correct login");
@@ -149,42 +150,64 @@ public class singUpInterface extends JFrame {
                     }
                 }
                 if (!addNewLoginPassword) {
-                    DriverManager.getConnection(url, username, password);
+                    conn = DriverManager.getConnection(url, username, password);
                     textError.setText("Connection successful!");
                     System.out.println("Connection successful! 22222"); //delete
                     headerFileWriteCache.write(username + "," + password + "\n");
                     openInterface.closeForm();
-                    cashierInterface secondFrame = new cashierInterface();
-                    secondFrame.setVisible(true);
 
-                    if(searchRole.equals("cashier")) {
-                        cashierInterface cashierFrame = new cashierInterface();
-                        cashierFrame.setVisible(true);
+                    statement = conn.createStatement();
+                    resultSet = statement.executeQuery(checkPermissions);
+                    if (resultSet.next()) {
+                        String role = resultSet.getString("role_employee");
+                        if ("admin".equals(role)) {
+                            adminInterface adminFrame = new adminInterface();
+                            adminFrame.setVisible(true);
+                        } else if ("cashier".equals(role)) {
+                            cashierInterface cashierFrame = new cashierInterface();
+                            cashierFrame.setVisible(true);
+                        }
                     }
-                    else if(searchRole.equals("admin")) {
-                        adminInterface adminFrame = new adminInterface();
-                        adminFrame.setVisible(true);
-                    }
+                    statement.close();
                 }
+                fileReadCache.close();
             }
             else if (headerFileReadCache.readLine() == null) {
                 if(!serviceFile.exists()){
                     serviceFile.createNewFile();
                     System.out.println("Create file serviceFile"); //delete
                 }
-                DriverManager.getConnection(url, username, password);
+                conn = DriverManager.getConnection(url, username, password);
                 headerFileWriteCache.write(username + "," + password + "\n");
                 textError.setText("Connection successful!");
                 System.out.println("Connection successful! 33333"); //delete
                 openInterface.closeForm();
-                cashierInterface secondFrame = new cashierInterface();
-                secondFrame.setVisible(true);
+
+                statement = conn.createStatement();
+                resultSet = statement.executeQuery(checkPermissions);
+                if (resultSet.next()) {
+                    String role = resultSet.getString("role_employee");
+                    if ("admin".equals(role)) {
+                        adminInterface adminFrame = new adminInterface();
+                        adminFrame.setVisible(true);
+                    } else if ("cashier".equals(role)) {
+                        cashierInterface cashierFrame = new cashierInterface();
+                        cashierFrame.setVisible(true);
+                    }
+                }
+                statement.close();
             }
         }
         catch (Exception ex){
-            System.out.println("Error: " + ex);
+            System.out.println("Error1: " + ex + "\n");
+            ex.printStackTrace();
         }
         headerFileReadCache.close();
         headerFileWriteCache.close();
+    }
+
+    public Connection getConnection() {
+        System.out.println("conn{000}: " + conn); //delete
+        return conn;
     }
 }
