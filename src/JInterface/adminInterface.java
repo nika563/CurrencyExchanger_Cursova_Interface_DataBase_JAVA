@@ -23,14 +23,17 @@ public class adminInterface extends JFrame implements ActionListener{
     private CardLayout cardLayout;
     private JPanel cardPanel, panel;
     private static JComboBox<String> comboBox, selectRoleComboBox, selectKeyCommissionComboBox, selectKeyEmployeeShiftComboBox,
-            selectKeyCurrencyCashRegisterComboBox, selectKeyShiftCashRegisterComboBox;
+            selectKeyCurrencyCashRegisterComboBox, selectKeyShiftCashRegisterComboBox,
+            selectKeyExchangerRateComboBox, selectKeyServiceComboBox;
     private static JTextField name_employee, telephone_employee, gmail_employee, login_employee, password_employee,
             name_currency, description_currency, availability_currency,
             name_service, description_service, sell_price_service, purchased_price_service,
             name_commission, price_commission,
             price_hour_shift,
-            start_price_cash_register, end_price_cash_register;
-    private static JLabel textError;
+            start_price_cash_register, end_price_cash_register,
+            purchase_price_currency_exchanger_rate, selling_price_currency_exchanger_rate,
+            calendar_cashier, end_calendar_cashier;
+    private static JLabel textError, presence_time_text;
     private static JButton send;
     private static JCalendar calendar_exchanger_rate, start_calendar_shift, end_calendar_shift,
             start_actual_calendar, end_actual_calendar;
@@ -59,13 +62,14 @@ public class adminInterface extends JFrame implements ActionListener{
         JPanel panelWithChangeData = createPanelChangeData("Change_data");
         JPanel panelWithSearchData = createPanelSearchData("Search_data");
         JPanel panelWithDeleteData = createPanelDeleteData("Delete_data");
+        JPanel panelWithSpecificRequestData = createPanelSpecificRequestData("Specific_request_data");
 
         // Добавление панелей в CardLayout
         cardPanel.add(panelWithAddData, "Add_data");
         cardPanel.add(panelWithChangeData, "Change_data");
         cardPanel.add(panelWithSearchData, "Search_data");
         cardPanel.add(panelWithDeleteData, "Delete_data");
-
+        cardPanel.add(panelWithSpecificRequestData, "Specific_request_data");
         add(cardPanel);
     }
     @Override
@@ -121,6 +125,14 @@ public class adminInterface extends JFrame implements ActionListener{
         deleteData.setFont(newFontDeleteData.deriveFont(17f)); // Устанавливаем новый шрифт и размер
         deleteData.setForeground(Color.black);
         deleteData.setBounds(0, 180,150,40);
+        //specific request
+        JLabel specificRequest = new JLabel("Specific data".toUpperCase());
+        specificRequest.setBorder(compound);
+        Font currentFontSpecificRequestData = header.getFont(); // Получаем текущий шрифт метки
+        Font newFontSpecificRequest = currentFontSpecificRequestData.deriveFont(Collections.singletonMap(TextAttribute.WEIGHT, TextAttribute.WEIGHT_SEMIBOLD));
+        specificRequest.setFont(newFontSpecificRequest.deriveFont(17f)); // Устанавливаем новый шрифт и размер
+        specificRequest.setForeground(Color.black);
+        specificRequest.setBounds(0, 230,150,40);
         //comboBox
         String[] menuItems = {"", "Працівник", "Валюти", "Послуга", "Курс обміну", "Тариф", "Зміна", "Сума в касі", "Присутність", "Валюта та курс обміну", "Валюти та послуги"};
         comboBox = new JComboBox<>(menuItems);
@@ -990,21 +1002,36 @@ public class adminInterface extends JFrame implements ActionListener{
                     start_actual_time.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
                     //end_actual_calendar
                     end_actual_calendar = new JCalendar();
-                    end_actual_calendar.setBounds(420, 80,260,210);
+                    end_actual_calendar.setBounds(810, 80,260,210);
                     end_actual_calendar.setFont(new Font("Arial", Font.PLAIN, 18));
                     end_actual_calendar.setForeground(Color.black);
                     end_actual_calendar.setBackground(Color.decode("#24743F"));
                     end_actual_calendar.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
                     //end_actual_time
-                    end_actual_time = ((JSpinner.DefaultEditor) startTimeShift.getEditor()).getTextField();
-                    end_actual_time.setBounds(690, 80,110,40);
+                    Date initialDate01 = new Date();
+                    SpinnerDateModel spinnerModel01 = new SpinnerDateModel(initialDate01, null, null, Calendar.HOUR_OF_DAY);
+                    endTimeShift  = new JSpinner(spinnerModel01);
+                    textField = new JSpinner.DateEditor(endTimeShift , "HH:mm:ss");
+                    endTimeShift.setEditor(textField);
+                    end_actual_time = ((JSpinner.DefaultEditor) endTimeShift.getEditor()).getTextField();
+                    end_actual_time.setBounds(1080, 80,110,40);
                     end_actual_time.setFont(new Font("Arial", Font.PLAIN, 18));
                     end_actual_time.setForeground(Color.black);
                     end_actual_time.setBackground(Color.decode("#24743F"));
                     end_actual_time.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+                    //presence_time_text
+                    presence_time_text = new JLabel("Presence time:");
+                    presence_time_text.setFont(new Font("Arial", Font.PLAIN, 18));
+                    presence_time_text.setForeground(Color.black);
+                    presence_time_text.setBounds(1200, -5,200,210); //ERROR
                     //presence_time
-                    presence_time = ((JSpinner.DefaultEditor) startTimeShift.getEditor()).getTextField();
-                    presence_time.setBounds(690, 80,110,40);
+                    Date initialDate02 = new Date();
+                    SpinnerDateModel spinnerModel02 = new SpinnerDateModel(initialDate02, null, null, Calendar.HOUR_OF_DAY);
+                    endTimeShift  = new JSpinner(spinnerModel01);
+                    textField = new JSpinner.DateEditor(endTimeShift , "HH:mm:ss");
+                    endTimeShift.setEditor(textField);
+                    presence_time = ((JSpinner.DefaultEditor) endTimeShift.getEditor()).getTextField();
+                    presence_time.setBounds(1330, 80,110,40);
                     presence_time.setFont(new Font("Arial", Font.PLAIN, 18));
                     presence_time.setForeground(Color.black);
                     presence_time.setBackground(Color.decode("#24743F"));
@@ -1014,13 +1041,12 @@ public class adminInterface extends JFrame implements ActionListener{
                     textError.setFont(new Font("Arial", Font.PLAIN, 18));
                     textError.setForeground(Color.decode("#000000"));
                     textError.setBounds(180, 170,290,50);
-
                     //selectKeyShiftArray
                     String[] selectKeyShiftArray;
                     try {
                         selectKeyShiftArray = addDataShiftInList().toArray(new String[0]);;
                         selectKeyShiftCashRegisterComboBox = new JComboBox<>(selectKeyShiftArray);
-                        selectKeyShiftCashRegisterComboBox.setBounds(930, 80,230,35);
+                        selectKeyShiftCashRegisterComboBox.setBounds(1080, 130,170,35);
                         selectKeyShiftCashRegisterComboBox.setFont(new Font("Arial", Font.PLAIN, 18));
                         selectKeyShiftCashRegisterComboBox.setForeground(Color.black);
                         selectKeyShiftCashRegisterComboBox.setBackground(Color.decode("#24743F"));
@@ -1058,7 +1084,7 @@ public class adminInterface extends JFrame implements ActionListener{
                     try {
                         selectKeyEmployeeArray = addDataEmployeeInList().toArray(new String[0]);;
                         selectKeyEmployeeShiftComboBox = new JComboBox<>(selectKeyEmployeeArray);
-                        selectKeyEmployeeShiftComboBox.setBounds(1210, 130,230,35);
+                        selectKeyEmployeeShiftComboBox.setBounds(1260, 130,210,35);
                         selectKeyEmployeeShiftComboBox.setFont(new Font("Arial", Font.PLAIN, 18));
                         selectKeyEmployeeShiftComboBox.setForeground(Color.black);
                         selectKeyEmployeeShiftComboBox.setBackground(Color.decode("#24743F"));
@@ -1091,7 +1117,6 @@ public class adminInterface extends JFrame implements ActionListener{
                             textError.setText("Please write data in commission");
                         }
                     }
-
                     //send
                     send = new JButton("Send");
                     send.setFont(new Font("Arial", Font.PLAIN, 18));
@@ -1109,11 +1134,12 @@ public class adminInterface extends JFrame implements ActionListener{
 
                     panel.add(start_actual_calendar);
                     panel.add(start_actual_time);
-                    //panel.add(end_actual_calendar);
-                    //panel.add(end_actual_time);
-                    //panel.add(presence_time);
-                    //panel.add(selectKeyShiftCashRegisterComboBox);
-                    //panel.add(selectKeyEmployeeShiftComboBox);
+                    panel.add(end_actual_calendar);
+                    panel.add(end_actual_time);
+                    panel.add(presence_time_text);
+                    panel.add(presence_time);
+                    panel.add(selectKeyShiftCashRegisterComboBox);
+                    panel.add(selectKeyEmployeeShiftComboBox);
                     panel.add(textError);
                     panel.add(send);
                     send.addActionListener(new eventSendDataBase());
@@ -1121,10 +1147,256 @@ public class adminInterface extends JFrame implements ActionListener{
                 else if ("Валюта та курс обміну".equals(selectedText)) {
                     deleteComponents();
                     System.out.println("Валюта та курс обміну");
+                    //purchase_price_currency_exchanger_rate
+                    purchase_price_currency_exchanger_rate  = new JTextField("Enter purchase price");
+                    purchase_price_currency_exchanger_rate.setBounds(420, 80,190,35);
+                    purchase_price_currency_exchanger_rate.setFont(new Font("Arial", Font.PLAIN, 18));
+                    purchase_price_currency_exchanger_rate.setForeground(Color.black);
+                    purchase_price_currency_exchanger_rate.setBackground(Color.decode("#24743F"));
+                    purchase_price_currency_exchanger_rate.setBorder(BorderFactory.createEmptyBorder(5,5,5,0));
+                    purchase_price_currency_exchanger_rate.addFocusListener(new FocusAdapter() {
+                        @Override
+                        public void focusGained(FocusEvent e) {
+                            if (purchase_price_currency_exchanger_rate.getText().equals("Enter purchase price")) {
+                                purchase_price_currency_exchanger_rate.setText("");
+                            }
+                        }
+                        @Override
+                        public void focusLost(FocusEvent e) {
+                            if (purchase_price_currency_exchanger_rate.getText().isEmpty()) {
+                                purchase_price_currency_exchanger_rate.setText("Enter purchase price");
+                            }
+                        }
+                    });
+                    //selling_price_currency_exchanger_rate
+                    selling_price_currency_exchanger_rate  = new JTextField("Enter selling price");
+                    selling_price_currency_exchanger_rate.setBounds(620, 80,160,35);
+                    selling_price_currency_exchanger_rate.setFont(new Font("Arial", Font.PLAIN, 18));
+                    selling_price_currency_exchanger_rate.setForeground(Color.black);
+                    selling_price_currency_exchanger_rate.setBackground(Color.decode("#24743F"));
+                    selling_price_currency_exchanger_rate.setBorder(BorderFactory.createEmptyBorder(5,5,5,0));
+                    selling_price_currency_exchanger_rate.addFocusListener(new FocusAdapter() {
+                        @Override
+                        public void focusGained(FocusEvent e) {
+                            if (selling_price_currency_exchanger_rate.getText().equals("Enter selling price")) {
+                                selling_price_currency_exchanger_rate.setText("");
+                            }
+                        }
+                        @Override
+                        public void focusLost(FocusEvent e) {
+                            if (selling_price_currency_exchanger_rate.getText().isEmpty()) {
+                                selling_price_currency_exchanger_rate.setText("Enter selling price");
+                            }
+                        }
+                    });
+                    //textError
+                    textError = new JLabel("");
+                    textError.setFont(new Font("Arial", Font.PLAIN, 18));
+                    textError.setForeground(Color.decode("#000000"));
+                    textError.setBounds(180, 170,290,50);
+                    //selectKeyCurrencyArray
+                    String[] selectKeyCurrencyArray;
+                    try {
+                        selectKeyCurrencyArray = addDataCurrencyInList().toArray(new String[0]);;
+                        selectKeyCurrencyCashRegisterComboBox = new JComboBox<>(selectKeyCurrencyArray);
+                        selectKeyCurrencyCashRegisterComboBox.setBounds(790, 80,240,35);
+                        selectKeyCurrencyCashRegisterComboBox.setFont(new Font("Arial", Font.PLAIN, 18));
+                        selectKeyCurrencyCashRegisterComboBox.setForeground(Color.black);
+                        selectKeyCurrencyCashRegisterComboBox.setBackground(Color.decode("#24743F"));
+                        selectKeyCurrencyCashRegisterComboBox.setRenderer(new DefaultListCellRenderer() {
+                            @Override
+                            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                                JComponent c = (JComponent) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                                c.setOpaque(true);
+                                c.setFont(new Font("Arial", Font.PLAIN, 18));
+                                c.setBorder(BorderFactory.createEmptyBorder(5,10,5,0));
+                                if (isSelected) {
+                                    c.setBackground(Color.decode("#1F9B49")); // Цвет фона
+                                    c.setForeground(Color.black); // Цвет текста
+                                }
+                                else{
+                                    c.setBackground(Color.decode("#24743F"));
+                                    c.setForeground(Color.black);
+                                }
+                                if (index == -1 && "".equals(value)) {
+                                    setText("Select name currency");
+                                }
+                                return this;
+                            }
+                        });
+                        selectKeyCurrencyCashRegisterComboBox.setSelectedIndex(0);
+                    }
+                    catch (Exception ex) {
+                        System.out.println("Error98: " + ex);
+                        if(ex instanceof ArrayIndexOutOfBoundsException){
+                            textError.setText("Please write data in currency");
+                        }
+                    }
+                    //selectKeyExchangerRate
+                    String[] selectKeyExchangerRateArray;
+                    try {
+                        selectKeyExchangerRateArray = addDataExhangerRateInList().toArray(new String[0]);;
+                        selectKeyExchangerRateComboBox = new JComboBox<>(selectKeyExchangerRateArray);
+                        selectKeyExchangerRateComboBox.setBounds(1040, 80,260,35);
+                        selectKeyExchangerRateComboBox.setFont(new Font("Arial", Font.PLAIN, 18));
+                        selectKeyExchangerRateComboBox.setForeground(Color.black);
+                        selectKeyExchangerRateComboBox.setBackground(Color.decode("#24743F"));
+                        selectKeyExchangerRateComboBox.setRenderer(new DefaultListCellRenderer() {
+                            @Override
+                            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                                JComponent c = (JComponent) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                                c.setOpaque(true);
+                                c.setFont(new Font("Arial", Font.PLAIN, 18));
+                                c.setBorder(BorderFactory.createEmptyBorder(5,10,5,0));
+                                if (isSelected) {
+                                    c.setBackground(Color.decode("#1F9B49")); // Цвет фона
+                                    c.setForeground(Color.black); // Цвет текста
+                                }
+                                else{
+                                    c.setBackground(Color.decode("#24743F"));
+                                    c.setForeground(Color.black);
+                                }
+                                if (index == -1 && "".equals(value)) {
+                                    setText("Select key exchanger rate");
+                                }
+                                return this;
+                            }
+                        });
+                        selectKeyExchangerRateComboBox.setSelectedIndex(0);
+                    }
+                    catch (Exception ex) {
+                        System.out.println("Error98: " + ex);
+                        if(ex instanceof ArrayIndexOutOfBoundsException){
+                            textError.setText("Please write data in currency");
+                        }
+                    }
+                    //send
+                    send = new JButton("Send");
+                    send.setFont(new Font("Arial", Font.PLAIN, 18));
+                    send.setForeground(Color.decode("#CADACF")); //color text
+                    send.setBackground(Color.decode("#284F00"));  //color background
+                    send.setBorder(BorderFactory.createLineBorder(Color.decode("#284F00"), 2));
+                    send.setFocusPainted(false);
+                    send.setBounds(180, 130,230,35);
+                    send.addMouseListener(new MouseAdapter() {
+                        public void mousePressed(MouseEvent me) {
+                            send.setForeground(Color.decode("#CADACF")); // меняем цвет текста на черный при нажатии
+                            send.setBackground(Color.decode("#1F9B49"));  //color background
+                        }
+                    });
+
+                    panel.add(purchase_price_currency_exchanger_rate);
+                    panel.add(selling_price_currency_exchanger_rate);
+                    panel.add(selectKeyCurrencyCashRegisterComboBox);
+                    panel.add(selectKeyExchangerRateComboBox);
+                    panel.add(textError);
+                    panel.add(send);
+                    send.addActionListener(new eventSendDataBase());
                 }
                 else if ("Валюти та послуги".equals(selectedText)) {
                     deleteComponents();
                     System.out.println("Валюти та послуги");
+                    //textError
+                    textError = new JLabel("");
+                    textError.setFont(new Font("Arial", Font.PLAIN, 18));
+                    textError.setForeground(Color.decode("#000000"));
+                    textError.setBounds(180, 170,290,50);
+                    //selectKeyCurrencyArray
+                    String[] selectKeyCurrencyArray;
+                    try {
+                        selectKeyCurrencyArray = addDataCurrencyInList().toArray(new String[0]);;
+                        selectKeyCurrencyCashRegisterComboBox = new JComboBox<>(selectKeyCurrencyArray);
+                        selectKeyCurrencyCashRegisterComboBox.setBounds(420, 80,240,35);
+                        selectKeyCurrencyCashRegisterComboBox.setFont(new Font("Arial", Font.PLAIN, 18));
+                        selectKeyCurrencyCashRegisterComboBox.setForeground(Color.black);
+                        selectKeyCurrencyCashRegisterComboBox.setBackground(Color.decode("#24743F"));
+                        selectKeyCurrencyCashRegisterComboBox.setRenderer(new DefaultListCellRenderer() {
+                            @Override
+                            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                                JComponent c = (JComponent) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                                c.setOpaque(true);
+                                c.setFont(new Font("Arial", Font.PLAIN, 18));
+                                c.setBorder(BorderFactory.createEmptyBorder(5,10,5,0));
+                                if (isSelected) {
+                                    c.setBackground(Color.decode("#1F9B49")); // Цвет фона
+                                    c.setForeground(Color.black); // Цвет текста
+                                }
+                                else{
+                                    c.setBackground(Color.decode("#24743F"));
+                                    c.setForeground(Color.black);
+                                }
+                                if (index == -1 && "".equals(value)) {
+                                    setText("Select name currency");
+                                }
+                                return this;
+                            }
+                        });
+                        selectKeyCurrencyCashRegisterComboBox.setSelectedIndex(0);
+                    }
+                    catch (Exception ex) {
+                        System.out.println("Error98: " + ex);
+                        if(ex instanceof ArrayIndexOutOfBoundsException){
+                            textError.setText("Please write data in currency");
+                        }
+                    }
+                    //selectKeyServiceArray
+                    String[] selectKeyServiceArray;
+                    try {
+                        selectKeyServiceArray = addDataServiceInList().toArray(new String[0]);;
+                        selectKeyServiceComboBox = new JComboBox<>(selectKeyServiceArray);
+                        selectKeyServiceComboBox.setBounds(670, 80,240,35);
+                        selectKeyServiceComboBox.setFont(new Font("Arial", Font.PLAIN, 18));
+                        selectKeyServiceComboBox.setForeground(Color.black);
+                        selectKeyServiceComboBox.setBackground(Color.decode("#24743F"));
+                        selectKeyServiceComboBox.setRenderer(new DefaultListCellRenderer() {
+                            @Override
+                            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                                JComponent c = (JComponent) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                                c.setOpaque(true);
+                                c.setFont(new Font("Arial", Font.PLAIN, 18));
+                                c.setBorder(BorderFactory.createEmptyBorder(5,10,5,0));
+                                if (isSelected) {
+                                    c.setBackground(Color.decode("#1F9B49")); // Цвет фона
+                                    c.setForeground(Color.black); // Цвет текста
+                                }
+                                else{
+                                    c.setBackground(Color.decode("#24743F"));
+                                    c.setForeground(Color.black);
+                                }
+                                if (index == -1 && "".equals(value)) {
+                                    setText("Select key service");
+                                }
+                                return this;
+                            }
+                        });
+                        selectKeyCurrencyCashRegisterComboBox.setSelectedIndex(0);
+                    }
+                    catch (Exception ex) {
+                        System.out.println("Error98: " + ex);
+                        if(ex instanceof ArrayIndexOutOfBoundsException){
+                            textError.setText("Please write data in service");
+                        }
+                    }
+                    //send
+                    send = new JButton("Send");
+                    send.setFont(new Font("Arial", Font.PLAIN, 18));
+                    send.setForeground(Color.decode("#CADACF")); //color text
+                    send.setBackground(Color.decode("#284F00"));  //color background
+                    send.setBorder(BorderFactory.createLineBorder(Color.decode("#284F00"), 2));
+                    send.setFocusPainted(false);
+                    send.setBounds(180, 130,230,35);
+                    send.addMouseListener(new MouseAdapter() {
+                        public void mousePressed(MouseEvent me) {
+                            send.setForeground(Color.decode("#CADACF")); // меняем цвет текста на черный при нажатии
+                            send.setBackground(Color.decode("#1F9B49"));  //color background
+                        }
+                    });
+
+                    panel.add(selectKeyCurrencyCashRegisterComboBox);
+                    panel.add(selectKeyServiceComboBox);
+                    panel.add(textError);
+                    panel.add(send);
+                    send.addActionListener(new eventSendDataBase());
                 }
                 panel.revalidate(); // Mетод используется для того, чтобы сообщить менеджеру компоновки о том, что произошли изменения
                 panel.repaint(); // Mетод запрашивает перерисовку компонента и его дочерних элементов
@@ -1147,12 +1419,17 @@ public class adminInterface extends JFrame implements ActionListener{
             @Override
             public void mouseClicked(MouseEvent e) {cardLayout.show(cardPanel, "Delete_data");}
         });
+        specificRequest.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {cardLayout.show(cardPanel, "Specific_request_data");}
+        });
 
         panel.add(comboBox);
         panel.add(addData);
         panel.add(changeData);
         panel.add(searchData);
         panel.add(deleteData);
+        panel.add(specificRequest);
         panel.add(menu);
         panel.add(header);
         return panel;
@@ -1307,8 +1584,38 @@ public class adminInterface extends JFrame implements ActionListener{
                     String keyShift = (String) selectKeyShiftCashRegisterComboBox.getSelectedItem();
                     addDataInDataBase(selectedItem, allStart, allEnd, presenceTime, keyEmployee, keyShift);
                 }
-                else if("Валюта та курс обміну".equals(selectedItem)){}
-                else if("Валюти та послуги".equals(selectedItem)){}
+                else if("Валюта та курс обміну".equals(selectedItem)){
+                    System.out.println("Валюта та курс обміну eventSendDataBase");
+                    String purchasePrice = purchase_price_currency_exchanger_rate.getText().trim();
+                    String sellingPrice = selling_price_currency_exchanger_rate.getText().trim();
+                    //comboBoX
+                    String nameCurrency = (String) selectKeyCurrencyCashRegisterComboBox.getSelectedItem();
+                    String keyExchangerRate = (String) selectKeyExchangerRateComboBox.getSelectedItem();
+
+                    if(purchasePrice.equals("Enter purchase price") || sellingPrice.equals("Enter selling price")){
+                        textError.setText("Please write number");
+                    }
+                    else if(nameCurrency.equals("Select name currency") || keyExchangerRate.equals("Select key exchanger rate")){
+                        textError.setText("Please chose data in currency or exchanger rate");
+                    }
+                    else {
+                        int availPurchasePrice = Integer.parseInt(purchasePrice);
+                        int availSellingPrice = Integer.parseInt(sellingPrice);
+                        addDataInDataBase(selectedItem, availPurchasePrice, availSellingPrice, nameCurrency, keyExchangerRate);
+                    }
+                }
+                else if("Валюти та послуги".equals(selectedItem)){
+                    System.out.println("Валюта та курс обміну eventSendDataBase");
+                    String nameCurrency = (String) selectKeyCurrencyCashRegisterComboBox.getSelectedItem();
+                    String keyService = (String) selectKeyServiceComboBox.getSelectedItem();
+
+                    if(nameCurrency.equals("Select name currency") || keyService.equals("Select key service")){
+                        textError.setText("Please write number");
+                    }
+                    else {
+                        addDataInDataBase(selectedItem, nameCurrency, keyService);
+                    }
+                }
             }
             catch (Exception ex){
                 System.out.println("Error909: " + ex);
@@ -1346,6 +1653,13 @@ public class adminInterface extends JFrame implements ActionListener{
                     panel.remove(box);
                 }
                 else if (box.equals(selectKeyShiftCashRegisterComboBox)) {
+                    panel.remove(box);
+                }
+                //currency exchanger rate
+                else if (box.equals(selectKeyExchangerRateComboBox)) {
+                    panel.remove(box);
+                }
+                else if (box.equals(selectKeyServiceComboBox)) {
                     panel.remove(box);
                 }
             }
@@ -1397,6 +1711,9 @@ public class adminInterface extends JFrame implements ActionListener{
             else if (component instanceof JLabel) {
                 JLabel jLabel = (JLabel) component;
                 if (jLabel.equals(textError)) {
+                    panel.remove(jLabel);
+                }
+                else if (jLabel.equals(presence_time_text)) {
                     panel.remove(jLabel);
                 }
             }
@@ -1456,6 +1773,13 @@ public class adminInterface extends JFrame implements ActionListener{
                     panel.remove(textField);
                 }
                 else if (textField.equals(end_price_cash_register)) {
+                    panel.remove(textField);
+                }
+                //currency exchanger rate
+                else if (textField.equals(purchase_price_currency_exchanger_rate)) {
+                    panel.remove(textField);
+                }
+                else if (textField.equals(selling_price_currency_exchanger_rate)) {
                     panel.remove(textField);
                 }
             }
@@ -1557,6 +1881,54 @@ public class adminInterface extends JFrame implements ActionListener{
             }
         }
         return selectIdShift;
+    }
+    //exchanger rate
+    private ArrayList<String> addDataExhangerRateInList() throws SQLException{
+        ArrayList<String> selectExchangerRate = new ArrayList<>();
+        try {
+            String getExchangerRate = "SELECT id_exchanger_rate FROM exchanger_rate;";
+            Statement statement = conn.createStatement();
+            System.out.println("resultIdExchangerRate: " + statement.executeQuery(getExchangerRate)); //delete
+            ResultSet resultExchangerRate = statement.executeQuery(getExchangerRate);
+            while (resultExchangerRate.next()) {
+                selectExchangerRate.add(resultExchangerRate.getString("id_exchanger_rate"));
+            }
+            if(selectExchangerRate.isEmpty()){
+                selectExchangerRate.add(0, "");
+                textError.setText("Please write data in exchanger rate");
+            }
+        }
+        catch(Exception ex){
+            System.out.println("Error addDataExhangerRateInList: " + ex);
+            if(ex instanceof NullPointerException){
+                selectExchangerRate.add(0, "");
+            }
+        }
+        return selectExchangerRate;
+    }
+    //service
+    private ArrayList<String> addDataServiceInList() throws SQLException{
+        ArrayList<String> selectService = new ArrayList<>();
+        try {
+            String getService = "SELECT id_service FROM service;";
+            Statement statement = conn.createStatement();
+            System.out.println("resultIdService: " + statement.executeQuery(getService)); //delete
+            ResultSet resultService = statement.executeQuery(getService);
+            while (resultService.next()) {
+                selectService.add(resultService.getString("id_service"));
+            }
+            if(selectService.isEmpty()){
+                selectService.add(0, "");
+                textError.setText("Please write data in service");
+            }
+        }
+        catch(Exception ex){
+            System.out.println("Error addDataSelectServiceInList: " + ex);
+            if(ex instanceof NullPointerException){
+                selectService.add(0, "");
+            }
+        }
+        return selectService;
     }
     public void addDataInDataBase(Object... dataForDataBase){
         try {
@@ -1852,14 +2224,55 @@ public class adminInterface extends JFrame implements ActionListener{
                 }
                 statement.close();
             }
-            else if("Валюта та курс обміну".equals(stringPoint)){}
-            else if("Валюти та послуги".equals(stringPoint)){}
+            else if("Валюта та курс обміну".equals(stringPoint)){
+                System.out.println("Валюта та курс обміну 111111{11111}"); //delete
+                Object availPurchasePrice = dataForDataBase[1];
+                Object availSellingPrice = dataForDataBase[2];
+                Object nameCurrency = dataForDataBase[3];
+                Object keyExchangerRate = dataForDataBase[4];
+                //insert
+                sqlAddData = "DO $$ \nDECLARE\n    currencyId INT;\nBEGIN\n    SELECT id_currency INTO currencyId FROM currency WHERE name_currency = \'" + nameCurrency + "\';\n" +
+                        "RAISE NOTICE \'Currency ID: %\', currencyId;\n    INSERT INTO currency_exchanger_rate (id_currency, id_exchanger_rate, purchase_price_currency_exchanger_rate, selling_price_currency_exchanger_rate) " +
+                        "VALUES (currencyId," + keyExchangerRate + ", " + availPurchasePrice + ", " + availSellingPrice + ");\n END $$;";
+
+                Statement statement = conn.createStatement();
+                if(!"Enter purchase price".equals(availPurchasePrice) || !"Enter selling price".equals(availSellingPrice)) {
+                    statement.executeUpdate(sqlAddData);
+                    textError.setText("Add data in Data Base");
+                }
+                statement.close();
+            }
+            else if("Валюти та послуги".equals(stringPoint)){
+                System.out.println("Валюта та курс обміну 111111{11111}"); //delete
+                Object nameCurrency = dataForDataBase[1];
+                Object keyService = dataForDataBase[2];
+                //insert
+                sqlAddData = "DO $$ \nDECLARE\n    currencyId INT;\nBEGIN\n    SELECT id_currency INTO currencyId FROM currency WHERE name_currency = \'" + nameCurrency + "\';\n" +
+                        "RAISE NOTICE \'Currency ID: %\', currencyId;\n    INSERT INTO currency_service (id_currency, id_service) " +
+                        "VALUES (currencyId, " + keyService + ");\n END $$;";
+
+                Statement statement = conn.createStatement();
+                if(!"Select name currency".equals(nameCurrency) || !"Select key service".equals(keyService)) {
+                    statement.executeUpdate(sqlAddData);
+                    textError.setText("Add data in Data Base");
+                }
+                statement.close();
+            }
         }
         catch (Exception ex){
             System.out.println("Errror: " + ex);
             textError.setText("Please write correct data");
         }
     }
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1920,37 +2333,114 @@ public class adminInterface extends JFrame implements ActionListener{
         deleteData.setFont(newFontDeleteData.deriveFont(17f)); // Устанавливаем новый шрифт и размер
         deleteData.setForeground(Color.black);
         deleteData.setBounds(0, 180,150,40);
+        //specific request
+        JLabel specificRequest = new JLabel("Specific data".toUpperCase());
+        specificRequest.setBorder(compound);
+        Font currentFontSpecificRequestData = header.getFont(); // Получаем текущий шрифт метки
+        Font newFontSpecificRequest = currentFontSpecificRequestData.deriveFont(Collections.singletonMap(TextAttribute.WEIGHT, TextAttribute.WEIGHT_SEMIBOLD));
+        specificRequest.setFont(newFontSpecificRequest.deriveFont(17f)); // Устанавливаем новый шрифт и размер
+        specificRequest.setForeground(Color.black);
+        specificRequest.setBounds(0, 230,150,40);
+
+        //comboBox
+        String[] menuItems = {"", "Працівник", "Валюти", "Послуга", "Курс обміну", "Тариф", "Зміна", "Сума в касі", "Присутність", "Валюта та курс обміну", "Валюти та послуги"};
+        comboBox = new JComboBox<>(menuItems);
+        comboBox.setBounds(180, 80,230,35);
+        comboBox.setFont(new Font("Arial", Font.PLAIN, 18));
+        comboBox.setForeground(Color.black);
+        comboBox.setBackground(Color.decode("#24743F"));
+        comboBox.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                JComponent c = (JComponent) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                c.setOpaque(true);
+                c.setFont(new Font("Arial", Font.PLAIN, 18));
+                c.setBorder(BorderFactory.createEmptyBorder(5,10,5,0));
+                if (isSelected) {
+                    c.setBackground(Color.decode("#1F9B49")); // Цвет фона
+                    c.setForeground(Color.black); // Цвет текста
+                }
+                else{
+                    c.setBackground(Color.decode("#24743F"));
+                    c.setForeground(Color.black);
+                }
+                if (index == -1 && "".equals(value)) {
+                    setText("Select item...");
+                }
+                return this;
+            }
+        });
+        comboBox.setSelectedIndex(0);
+        comboBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JComboBox<String> comboBox = (JComboBox<String>) e.getSource();
+                String selectedText = (String) comboBox.getSelectedItem();
+                if ("Працівник".equals(selectedText)) {
+                    deleteComponents();
+                }
+                else if ("Валюти".equals(selectedText)) {
+                    deleteComponents();
+                }
+                else if ("Послуга".equals(selectedText)) {
+                    deleteComponents();
+                }
+                else if ("Курс обміну".equals(selectedText)) {
+                    deleteComponents();
+                }
+                else if ("Тариф".equals(selectedText)) {
+                    deleteComponents();
+                }
+                else if ("Зміна".equals(selectedText)) {
+                    deleteComponents();
+                }
+                else if ("Сума в касі".equals(selectedText)) {
+                    deleteComponents();
+                }
+                else if ("Присутність".equals(selectedText)) {
+                    deleteComponents();
+                }
+                else if ("Валюта та курс обміну".equals(selectedText)) {
+                    deleteComponents();
+                }
+                else if ("Валюти та послуги".equals(selectedText)) {
+                    deleteComponents();
+                }
+            }
+        });
 
         //event
         addData.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e) {
-                cardLayout.show(cardPanel, "Add_data");
+            public void mouseClicked(MouseEvent e) {cardLayout.show(cardPanel, "Add_data");
             }
         });
         changeData.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e) {
-                cardLayout.show(cardPanel, "Change_data");
+            public void mouseClicked(MouseEvent e) {cardLayout.show(cardPanel, "Change_data");
             }
         });
         searchData.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e) {
-                cardLayout.show(cardPanel, "Search_data");
+            public void mouseClicked(MouseEvent e) {cardLayout.show(cardPanel, "Search_data");
             }
         });
         deleteData.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e) {
-                cardLayout.show(cardPanel, "Delete_data");
+            public void mouseClicked(MouseEvent e) {cardLayout.show(cardPanel, "Delete_data");
             }
         });
+        specificRequest.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {cardLayout.show(cardPanel, "Specific_request_data");}
+        });
 
+        panel.add(comboBox);
         panel.add(addData);
         panel.add(changeData);
         panel.add(searchData);
         panel.add(deleteData);
+        panel.add(specificRequest);
         panel.add(menu);
         panel.add(header);
         return panel;
@@ -2007,7 +2497,80 @@ public class adminInterface extends JFrame implements ActionListener{
         deleteData.setFont(newFontDeleteData.deriveFont(17f)); // Устанавливаем новый шрифт и размер
         deleteData.setForeground(Color.black);
         deleteData.setBounds(0, 180,150,40);
-
+        //specific request
+        JLabel specificRequest = new JLabel("Specific data".toUpperCase());
+        specificRequest.setBorder(compound);
+        Font currentFontSpecificRequestData = header.getFont(); // Получаем текущий шрифт метки
+        Font newFontSpecificRequest = currentFontSpecificRequestData.deriveFont(Collections.singletonMap(TextAttribute.WEIGHT, TextAttribute.WEIGHT_SEMIBOLD));
+        specificRequest.setFont(newFontSpecificRequest.deriveFont(17f)); // Устанавливаем новый шрифт и размер
+        specificRequest.setForeground(Color.black);
+        specificRequest.setBounds(0, 230,150,40);
+        //comboBox
+        String[] menuItems = {"", "Працівник", "Валюти", "Послуга", "Курс обміну", "Тариф", "Зміна", "Сума в касі", "Присутність", "Валюта та курс обміну", "Валюти та послуги"};
+        comboBox = new JComboBox<>(menuItems);
+        comboBox.setBounds(180, 80,230,35);
+        comboBox.setFont(new Font("Arial", Font.PLAIN, 18));
+        comboBox.setForeground(Color.black);
+        comboBox.setBackground(Color.decode("#24743F"));
+        comboBox.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                JComponent c = (JComponent) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                c.setOpaque(true);
+                c.setFont(new Font("Arial", Font.PLAIN, 18));
+                c.setBorder(BorderFactory.createEmptyBorder(5,10,5,0));
+                if (isSelected) {
+                    c.setBackground(Color.decode("#1F9B49")); // Цвет фона
+                    c.setForeground(Color.black); // Цвет текста
+                }
+                else{
+                    c.setBackground(Color.decode("#24743F"));
+                    c.setForeground(Color.black);
+                }
+                if (index == -1 && "".equals(value)) {
+                    setText("Select item...");
+                }
+                return this;
+            }
+        });
+        comboBox.setSelectedIndex(0);
+        comboBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JComboBox<String> comboBox = (JComboBox<String>) e.getSource();
+                String selectedText = (String) comboBox.getSelectedItem();
+                if ("Працівник".equals(selectedText)) {
+                    deleteComponents();
+                }
+                else if ("Валюти".equals(selectedText)) {
+                    deleteComponents();
+                }
+                else if ("Послуга".equals(selectedText)) {
+                    deleteComponents();
+                }
+                else if ("Курс обміну".equals(selectedText)) {
+                    deleteComponents();
+                }
+                else if ("Тариф".equals(selectedText)) {
+                    deleteComponents();
+                }
+                else if ("Зміна".equals(selectedText)) {
+                    deleteComponents();
+                }
+                else if ("Сума в касі".equals(selectedText)) {
+                    deleteComponents();
+                }
+                else if ("Присутність".equals(selectedText)) {
+                    deleteComponents();
+                }
+                else if ("Валюта та курс обміну".equals(selectedText)) {
+                    deleteComponents();
+                }
+                else if ("Валюти та послуги".equals(selectedText)) {
+                    deleteComponents();
+                }
+            }
+        });
         //event
         addData.addMouseListener(new MouseAdapter() {
             @Override
@@ -2033,11 +2596,17 @@ public class adminInterface extends JFrame implements ActionListener{
                 cardLayout.show(cardPanel, "Delete_data");
             }
         });
+        specificRequest.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {cardLayout.show(cardPanel, "Specific_request_data");}
+        });
 
+        panel.add(comboBox);
         panel.add(addData);
         panel.add(changeData);
         panel.add(searchData);
         panel.add(deleteData);
+        panel.add(specificRequest);
         panel.add(menu);
         panel.add(header);
         return panel;
@@ -2094,7 +2663,80 @@ public class adminInterface extends JFrame implements ActionListener{
         deleteData.setFont(newFontDeleteData.deriveFont(17f)); // Устанавливаем новый шрифт и размер
         deleteData.setForeground(Color.decode("#B1FDC6"));
         deleteData.setBounds(0, 180,150,40);
-
+        //specific request
+        JLabel specificRequest = new JLabel("Specific data".toUpperCase());
+        specificRequest.setBorder(compound);
+        Font currentFontSpecificRequestData = header.getFont(); // Получаем текущий шрифт метки
+        Font newFontSpecificRequest = currentFontSpecificRequestData.deriveFont(Collections.singletonMap(TextAttribute.WEIGHT, TextAttribute.WEIGHT_SEMIBOLD));
+        specificRequest.setFont(newFontSpecificRequest.deriveFont(17f)); // Устанавливаем новый шрифт и размер
+        specificRequest.setForeground(Color.black);
+        specificRequest.setBounds(0, 230,150,40);
+        //comboBox
+        String[] menuItems = {"", "Працівник", "Валюти", "Послуга", "Курс обміну", "Тариф", "Зміна", "Сума в касі", "Присутність", "Валюта та курс обміну", "Валюти та послуги"};
+        comboBox = new JComboBox<>(menuItems);
+        comboBox.setBounds(180, 80,230,35);
+        comboBox.setFont(new Font("Arial", Font.PLAIN, 18));
+        comboBox.setForeground(Color.black);
+        comboBox.setBackground(Color.decode("#24743F"));
+        comboBox.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                JComponent c = (JComponent) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                c.setOpaque(true);
+                c.setFont(new Font("Arial", Font.PLAIN, 18));
+                c.setBorder(BorderFactory.createEmptyBorder(5,10,5,0));
+                if (isSelected) {
+                    c.setBackground(Color.decode("#1F9B49")); // Цвет фона
+                    c.setForeground(Color.black); // Цвет текста
+                }
+                else{
+                    c.setBackground(Color.decode("#24743F"));
+                    c.setForeground(Color.black);
+                }
+                if (index == -1 && "".equals(value)) {
+                    setText("Select item...");
+                }
+                return this;
+            }
+        });
+        comboBox.setSelectedIndex(0);
+        comboBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JComboBox<String> comboBox = (JComboBox<String>) e.getSource();
+                String selectedText = (String) comboBox.getSelectedItem();
+                if ("Працівник".equals(selectedText)) {
+                    deleteComponents();
+                }
+                else if ("Валюти".equals(selectedText)) {
+                    deleteComponents();
+                }
+                else if ("Послуга".equals(selectedText)) {
+                    deleteComponents();
+                }
+                else if ("Курс обміну".equals(selectedText)) {
+                    deleteComponents();
+                }
+                else if ("Тариф".equals(selectedText)) {
+                    deleteComponents();
+                }
+                else if ("Зміна".equals(selectedText)) {
+                    deleteComponents();
+                }
+                else if ("Сума в касі".equals(selectedText)) {
+                    deleteComponents();
+                }
+                else if ("Присутність".equals(selectedText)) {
+                    deleteComponents();
+                }
+                else if ("Валюта та курс обміну".equals(selectedText)) {
+                    deleteComponents();
+                }
+                else if ("Валюти та послуги".equals(selectedText)) {
+                    deleteComponents();
+                }
+            }
+        });
         //event
         addData.addMouseListener(new MouseAdapter() {
             @Override
@@ -2120,14 +2762,327 @@ public class adminInterface extends JFrame implements ActionListener{
                 cardLayout.show(cardPanel, "Delete_data");
             }
         });
+        specificRequest.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {cardLayout.show(cardPanel, "Specific_request_data");}
+        });
 
+        panel.add(comboBox);
         panel.add(addData);
         panel.add(changeData);
         panel.add(searchData);
         panel.add(deleteData);
+        panel.add(specificRequest);
         panel.add(menu);
         panel.add(header);
         return panel;
     }
+    private JPanel createPanelSpecificRequestData(String cardName)  {
+        JPanel panel = new JPanel(null);
+        JPanel menu = new JPanel(null);
+        panel.setBackground(Color.decode("#5FB67D"));
+        menu.setBackground(Color.decode("#228845"));
+        menu.setBounds(0, 0, 150, Toolkit.getDefaultToolkit().getScreenSize().height); // Устанавливаем размер и позицию меню
+        Map<TextAttribute, Object> attributes = new HashMap<>();
+        CompoundBorder compound = new CompoundBorder(
+                new MatteBorder(0, 0, 2, 0, Color.BLACK), // Нижняя граница
+                new EmptyBorder(0, 16, 15, 0) // Отступы
+        );
 
+        //Menu admin
+        JLabel header = new JLabel("Menu admin".toUpperCase());
+        Font currentFontHeader = header.getFont(); // Получаем текущий шрифт метки
+        Font newFont = currentFontHeader.deriveFont(Collections.singletonMap(TextAttribute.WEIGHT, TextAttribute.WEIGHT_SEMIBOLD));
+        attributes.put(TextAttribute.FAMILY, "Arial");
+        header.setFont(newFont.deriveFont(20f)); // Устанавливаем новый шрифт и размер
+        header.setForeground(Color.black);
+        header.setBounds(750, 20,150,20);
+        //addData
+        JLabel addData = new JLabel("Add data".toUpperCase());
+        addData.setBorder(compound);
+        Font currentFontAddData = header.getFont(); // Получаем текущий шрифт метки
+        Font newFontAddData = currentFontAddData.deriveFont(Collections.singletonMap(TextAttribute.WEIGHT, TextAttribute.WEIGHT_SEMIBOLD));
+        addData.setFont(newFontAddData.deriveFont(17f)); // Устанавливаем новый шрифт и размер
+        addData.setForeground(Color.black);
+        addData.setBounds(0, 14,150,40);
+        //changeData
+        JLabel changeData = new JLabel("Change data".toUpperCase());
+        changeData.setBorder(compound);
+        Font currentFontChangeData = header.getFont(); // Получаем текущий шрифт метки
+        Font newFontChangeData = currentFontChangeData.deriveFont(Collections.singletonMap(TextAttribute.WEIGHT, TextAttribute.WEIGHT_SEMIBOLD));
+        changeData.setFont(newFontChangeData.deriveFont(17f)); // Устанавливаем новый шрифт и размер
+        changeData.setForeground(Color.black);
+        changeData.setBounds(0, 70,150,40);
+        //searchData
+        JLabel searchData = new JLabel("Search data".toUpperCase());
+        searchData.setBorder(compound);
+        Font currentFontSearchData = header.getFont(); // Получаем текущий шрифт метки
+        Font newFontSearchData = currentFontSearchData.deriveFont(Collections.singletonMap(TextAttribute.WEIGHT, TextAttribute.WEIGHT_SEMIBOLD));
+        searchData.setFont(newFontSearchData.deriveFont(17f)); // Устанавливаем новый шрифт и размер
+        searchData.setForeground(Color.black);
+        searchData.setBounds(0, 125,150,40);
+        //deleteData
+        JLabel deleteData = new JLabel("Delete data".toUpperCase());
+        deleteData.setBorder(compound);
+        Font currentFontDeleteData = header.getFont(); // Получаем текущий шрифт метки
+        Font newFontDeleteData = currentFontDeleteData.deriveFont(Collections.singletonMap(TextAttribute.WEIGHT, TextAttribute.WEIGHT_SEMIBOLD));
+        deleteData.setFont(newFontDeleteData.deriveFont(17f)); // Устанавливаем новый шрифт и размер
+        deleteData.setForeground(Color.black);
+        deleteData.setBounds(0, 180,150,40);
+        //specific request
+        JLabel specificRequest = new JLabel("Specific data".toUpperCase());
+        specificRequest.setBorder(compound);
+        Font currentFontSpecificRequestData = header.getFont(); // Получаем текущий шрифт метки
+        Font newFontSpecificRequest = currentFontSpecificRequestData.deriveFont(Collections.singletonMap(TextAttribute.WEIGHT, TextAttribute.WEIGHT_SEMIBOLD));
+        specificRequest.setFont(newFontSpecificRequest.deriveFont(17f)); // Устанавливаем новый шрифт и размер
+        specificRequest.setForeground(Color.decode("#B1FDC6"));
+        specificRequest.setBounds(0, 230,150,40);
+
+        String[] menuItems = {"", "List of cashiers who work on X day", "Find cashiers' names starting with a given number of letters",
+                "List of cashiers present on X day to X day", "How many cashiers were there on X day to X day", "How many bills did each cashier make on X day",
+                "Which cashier worked the most shifts in X month", "Find cashiers who worked more hours than the average number of hours",
+                "Which cashier did not work X shift",
+                "A list of currencies with the comment \"Maximum quantity\" and a list of currencies with the comment \"The required quantity is not available\""};
+        comboBox = new JComboBox<>(menuItems);
+        comboBox.setBounds(180, 80,350,35);
+        comboBox.setFont(new Font("Arial", Font.PLAIN, 18));
+        comboBox.setForeground(Color.black);
+        comboBox.setBackground(Color.decode("#24743F"));
+        comboBox.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                JComponent c = (JComponent) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                c.setOpaque(true);
+                c.setFont(new Font("Arial", Font.PLAIN, 18));
+                c.setBorder(BorderFactory.createEmptyBorder(5,10,5,0));
+                if (isSelected) {
+                    c.setBackground(Color.decode("#1F9B49")); // Цвет фона
+                    c.setForeground(Color.black); // Цвет текста
+                }
+                else{
+                    c.setBackground(Color.decode("#24743F"));
+                    c.setForeground(Color.black);
+                }
+                if (index == -1 && "".equals(value)) {
+                    setText("Select item...");
+                }
+                return this;
+            }
+        });
+        comboBox.setSelectedIndex(0);
+        comboBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JComboBox<String> comboBox = (JComboBox<String>) e.getSource();
+                String selectedText = (String) comboBox.getSelectedItem();
+                if ("List of cashiers who work on X day".equals(selectedText)) {
+                    deleteComponents();
+                    try {
+                        textError = new JLabel("List of cashiers who work on X day:");
+                        textError.setFont(new Font("Arial", Font.PLAIN, 18));
+                        textError.setForeground(Color.decode("#000000"));
+                        textError.setBounds(550, 80, 1500, 50);
+                        //start_actual_calendar
+                        start_actual_calendar = new JCalendar();
+                        start_actual_calendar.setBounds(550, 130, 250, 210);
+                        start_actual_calendar.setFont(new Font("Arial", Font.PLAIN, 18));
+                        start_actual_calendar.setForeground(Color.black);
+                        start_actual_calendar.setBackground(Color.decode("#24743F"));
+                        start_actual_calendar.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+                        //send
+                        send = new JButton("Send");
+                        send.setFont(new Font("Arial", Font.PLAIN, 18));
+                        send.setForeground(Color.decode("#CADACF")); //color text
+                        send.setBackground(Color.decode("#284F00"));  //color background
+                        send.setBorder(BorderFactory.createLineBorder(Color.decode("#284F00"), 2));
+                        send.setFocusPainted(false);
+                        send.setBounds(180, 130, 100, 35);
+                        send.addMouseListener(new MouseAdapter() {
+                            public void mousePressed(MouseEvent me) {
+                                send.setForeground(Color.decode("#CADACF")); // меняем цвет текста на черный при нажатии
+                                send.setBackground(Color.decode("#1F9B49"));  //color background
+                            }
+                        });
+                    }
+                    catch(Exception ex){
+                        System.out.println("Error: " + ex);
+                    }
+                    panel.add(start_actual_calendar);
+                    panel.add(textError);
+                    panel.add(send);
+                }
+                else if ("Find cashiers' names starting with a given number of letters".equals(selectedText)) {
+                    deleteComponents();
+                    //--------Find cashiers' names starting with a given number of letters:-------
+                    try {
+                        textError = new JLabel("Find cashiers' names starting:");
+                        textError.setFont(new Font("Arial", Font.PLAIN, 18));
+                        textError.setForeground(Color.decode("#000000"));
+                        textError.setBounds(480, 80,250,50);
+                        //name_employee
+                        name_employee = new JTextField("Enter name employee");
+                        name_employee.setBounds(480, 130,190,35);
+                        name_employee.setFont(new Font("Arial", Font.PLAIN, 18));
+                        name_employee.setForeground(Color.black);
+                        name_employee.setBackground(Color.decode("#24743F"));
+                        name_employee.setBorder(BorderFactory.createEmptyBorder(5,5,5,0));
+                        name_employee.addFocusListener(new FocusAdapter() {
+                            @Override
+                            public void focusGained(FocusEvent e) {
+                                if (name_employee.getText().equals("Enter name employee")) {
+                                    name_employee.setText("");
+                                }
+                            }
+                            @Override
+                            public void focusLost(FocusEvent e) {
+                                if (name_employee.getText().isEmpty()) {
+                                    name_employee.setText("Enter name employee");
+                                }
+                            }
+                        });
+                        //send
+                        send = new JButton("Send");
+                        send.setFont(new Font("Arial", Font.PLAIN, 18));
+                        send.setForeground(Color.decode("#CADACF")); //color text
+                        send.setBackground(Color.decode("#284F00"));  //color background
+                        send.setBorder(BorderFactory.createLineBorder(Color.decode("#284F00"), 2));
+                        send.setFocusPainted(false);
+                        send.setBounds(180, 130,100,35);
+                        send.addMouseListener(new MouseAdapter() {
+                            public void mousePressed(MouseEvent me) {
+                                send.setForeground(Color.decode("#CADACF")); // меняем цвет текста на черный при нажатии
+                                send.setBackground(Color.decode("#1F9B49"));  //color background
+                            }
+                        });
+                    }
+                    catch(Exception ex){
+                        System.out.println("Error: " + ex);
+                    }
+
+                    panel.add(textError);
+                    panel.add(name_employee);
+                    panel.add(send);
+                }
+                else if ("List of cashiers present on X day to X day".equals(selectedText)) {
+                    deleteComponents();
+                    //--------Список присутствующих кассиров в X день по X день:-------
+                    try {
+                        textError = new JLabel("List of cashiers present on X day to X day:");
+                        textError.setFont(new Font("Arial", Font.PLAIN, 18));
+                        textError.setForeground(Color.decode("#000000"));
+                        textError.setBounds(480, 220,350,50);
+                        //calendar_cashier
+                        calendar_cashier  = new JTextField("2024-12-01");
+                        calendar_cashier.setBounds(480, 270,130,35);
+                        calendar_cashier.setFont(new Font("Arial", Font.PLAIN, 18));
+                        calendar_cashier.setForeground(Color.black);
+                        calendar_cashier.setBackground(Color.decode("#24743F"));
+                        calendar_cashier.setBorder(BorderFactory.createEmptyBorder(5,5,5,0));
+                        calendar_cashier.addFocusListener(new FocusAdapter() {
+                            @Override
+                            public void focusGained(FocusEvent e) {
+                                if (calendar_cashier.getText().equals("2024-12-01")) {
+                                    calendar_cashier.setText("");
+                                }
+                            }
+                            @Override
+                            public void focusLost(FocusEvent e) {
+                                if (calendar_cashier.getText().isEmpty()) {
+                                    calendar_cashier.setText("2024-12-01");
+                                }
+                            }
+                        });
+                        //end_calendar_cashier
+                        end_calendar_cashier  = new JTextField("2024-12-12");
+                        end_calendar_cashier.setBounds(480, 320,130,35);
+                        end_calendar_cashier.setFont(new Font("Arial", Font.PLAIN, 18));
+                        end_calendar_cashier.setForeground(Color.black);
+                        end_calendar_cashier.setBackground(Color.decode("#24743F"));
+                        end_calendar_cashier.setBorder(BorderFactory.createEmptyBorder(5,5,5,0));
+                        end_calendar_cashier.addFocusListener(new FocusAdapter() {
+                            @Override
+                            public void focusGained(FocusEvent e) {
+                                if (end_calendar_cashier.getText().equals("2024-12-12")) {
+                                    end_calendar_cashier.setText("");
+                                }
+                            }
+                            @Override
+                            public void focusLost(FocusEvent e) {
+                                if (end_calendar_cashier.getText().isEmpty()) {
+                                    end_calendar_cashier.setText("2024-12-12");
+                                }
+                            }
+                        });
+                        //send
+                        send = new JButton("Send");
+                        send.setFont(new Font("Arial", Font.PLAIN, 18));
+                        send.setForeground(Color.decode("#CADACF")); //color text
+                        send.setBackground(Color.decode("#284F00"));  //color background
+                        send.setBorder(BorderFactory.createLineBorder(Color.decode("#284F00"), 2));
+                        send.setFocusPainted(false);
+                        send.setBounds(180, 130,100,35);
+                        send.addMouseListener(new MouseAdapter() {
+                            public void mousePressed(MouseEvent me) {
+                                send.setForeground(Color.decode("#CADACF")); // меняем цвет текста на черный при нажатии
+                                send.setBackground(Color.decode("#1F9B49"));  //color background
+                            }
+                        });
+                    }
+                    catch(Exception ex){
+                        System.out.println("Error: " + ex);
+                    }
+
+                    panel.add(textError);
+                    panel.add(calendar_cashier);
+                    panel.add(end_calendar_cashier);
+                    panel.add(send);
+                }
+                else if ("How many cashiers were there on X day to X day".equals(selectedText)) {
+                    deleteComponents();
+                }
+                else if ("How many bills did each cashier make on X day".equals(selectedText)) {
+                    deleteComponents();
+                }
+                else if ("Which cashier worked the most shifts in X month".equals(selectedText)) {
+                    deleteComponents();
+                }
+                else if ("Find cashiers who worked more hours than the average number of hours".equals(selectedText)) {
+                    deleteComponents();
+                }
+                else if ("Which cashier did not work X shift".equals(selectedText)) {
+                    deleteComponents();
+                }
+                else if ("A list of currencies with the comment \"Maximum quantity\" and a list of currencies with the comment \"The required quantity is not available\"".equals(selectedText)) {
+                    deleteComponents();
+                }
+                comboBox = new JComboBox<>(menuItems);
+            }
+        });
+
+        //event
+        addData.addMouseListener(new MouseAdapter() { @Override public void mouseClicked(MouseEvent e) {cardLayout.show(cardPanel, "Add_data");
+            }});
+        changeData.addMouseListener(new MouseAdapter() { @Override public void mouseClicked(MouseEvent e) {cardLayout.show(cardPanel, "Change_data");
+            }});
+        searchData.addMouseListener(new MouseAdapter() { @Override public void mouseClicked(MouseEvent e) {cardLayout.show(cardPanel, "Search_data");}});
+        deleteData.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {cardLayout.show(cardPanel, "Delete_data");}
+        });
+        specificRequest.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {cardLayout.show(cardPanel, "Specific_request_data");}
+        });
+
+
+        panel.add(comboBox);
+        panel.add(addData);
+        panel.add(changeData);
+        panel.add(searchData);
+        panel.add(deleteData);
+        panel.add(specificRequest);
+        panel.add(menu);
+        panel.add(header);
+        return panel;
+    }
 }
